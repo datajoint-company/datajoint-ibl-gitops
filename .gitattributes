@@ -1,2 +1,4 @@
 #pattern  filter=crypt diff=crypt merge=crypt
-navigator/secret.yaml  filter=crypt diff=crypt merge=crypt
+k8s/deployments/navigator/secret.yaml filter=crypt diff=crypt merge=crypt
+k8s/cluster/cluster.internationalbrainlab.org.yaml filter=crypt diff=crypt merge=crypt
+keys/cluster.internationalbrainlab.org.pem filter=crypt diff=crypt merge=crypt
