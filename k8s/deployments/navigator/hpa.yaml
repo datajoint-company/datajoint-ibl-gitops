@@ -3,7 +3,6 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: iblapi
-  namespace: default
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -24,7 +23,6 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: ibl-frontend
-  namespace: default
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -45,7 +43,6 @@ apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: ibl-node-server
-  namespace: default
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
