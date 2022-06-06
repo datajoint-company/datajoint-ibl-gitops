@@ -1,8 +1,17 @@
-U2FsdGVkX18QIMAYcSKvX/7J6smz2h+XnEq64b7j2N+vU98px30GwbJa70IB6nCf7hHdeniLvXgP
-SV5Wqd+eLLSKevnRU4x8kp5049uF2LBc+8mv0I6J34ACIqz8JTU6XU5spmxX1qNnBz/2rIMl9A4v
-xhuWYA2Wm0LnTCqIiALCAQyuMrtPfhnjdFyi4q7G+k4PAnqlc47f79eRwElTlWPNToK+gbsS7hHZ
-AEb5OgoDzq6xltoTMiVuSQ/8A7SfcD47LVePp2k2DIgEGQ9rzykPAqJxJWTjnM2JNOVSdEHFnvtd
-2dG5CAEL4YrygrtdYAHk6EvTBNaXKXB1DC+E+dqL7iskZIOJFYcwCJFuo3zp1yd4ZVA630ZEG+qO
-PIg6SdxndpXAtcLq1Vsy6s2o8b32GJS921M4rgGUNaRNrR5oD/SDpQrkOfJr/kggMLls1sB0q+kV
-yOsgtu/5SQpxHQrvUvdWDFtkmUy9sIkmF6OocWrn8kSCOzsafRNbGE/Bgxgc+8XK3YNRHSeRX1aN
-9A==
+node_pools:
+    - name: default-master
+      machine_size: large
+      count.min: "1"
+      count.max: "2"
+      root_volume_size: "30"
+    - name: default-node
+      machine_size: large
+      count.min: "1"
+      count.max: "6"
+      root_volume_size: "64"
+    - name: jhub-user
+      machine_size: large
+      count.min: "1"
+      count.max: "3"
+      root_volume_size: "64"
+

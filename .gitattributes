@@ -3,5 +3,3 @@ k8s/deployments/navigator/secret.yaml filter=crypt diff=crypt merge=crypt
 k8s/cluster/cluster.internationalbrainlab.org.yaml filter=crypt diff=crypt merge=crypt
 keys/cluster.internationalbrainlab.org.pem filter=crypt diff=crypt merge=crypt
 k8s/cluster/kube-files/cluster.kube.env filter=crypt diff=crypt merge=crypt
-k8s/cluster/kube-files/kops_cluster.internationalbrainlab.org.yaml filter=crypt diff=crypt merge=crypt
-k8s/cluster/kube-files/node_pool.yaml filter=crypt diff=crypt merge=crypt
