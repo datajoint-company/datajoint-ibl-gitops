@@ -1,0 +1,131 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: Cluster
+metadata:
+  creationTimestamp: null
+  name: cluster.internationalbrainlab.org
+spec:
+  api:
+    loadBalancer:
+      class: Classic
+      type: Public
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://cluster.internationalbrainlab.org/cluster.internationalbrainlab.org
+  etcdClusters:
+    - cpuRequest: 200m
+      etcdMembers:
+        - encryptedVolume: true
+          instanceGroup: master-us-east-1a
+          name: a
+      memoryRequest: 100Mi
+      name: main
+    - cpuRequest: 100m
+      etcdMembers:
+        - encryptedVolume: true
+          instanceGroup: master-us-east-1a
+          name: a
+      memoryRequest: 100Mi
+      name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubelet:
+    anonymousAuth: false
+  kubernetesApiAccess:
+    - 0.0.0.0/0
+  kubernetesVersion: 1.21.12
+  masterPublicName: api.cluster.internationalbrainlab.org
+  networkCIDR: 172.21.0.0/16
+  networkID: vpc-058bb5677edef9b58
+  networking:
+    weave:
+      mtu: 8912
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+    - 0.0.0.0/0
+  subnets:
+    - cidr: 172.21.32.0/19
+      name: us-east-1a
+      type: Private
+      zone: us-east-1a
+    - cidr: 172.21.0.0/22
+      name: utility-us-east-1a
+      type: Utility
+      zone: us-east-1a
+  topology:
+    dns:
+      type: Private
+    masters: private
+    nodes: private
+  authentication:
+    aws: {}
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: cluster.internationalbrainlab.org
+  name: master-us-east-1a
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220509
+  machineType: t3a.large
+  maxSize: 2
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-us-east-1a
+  role: Master
+  subnets:
+    - us-east-1a
+  rootVolumeSize: 30
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: cluster.internationalbrainlab.org
+  name: nodes-us-east-1a
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220509
+  machineType: t3a.large
+  maxSize: 6
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: nodes-us-east-1a
+  role: Node
+  subnets:
+    - us-east-1a
+  cloudLabels:
+    k8s.io/cluster-autoscaler/cluster.internationalbrainlab.org: owned
+    k8s.io/cluster-autoscaler/enabled: 'true'
+  rootVolumeSize: 64
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: cluster.internationalbrainlab.org
+  name: jhub-user-nodes
+  generation: 1
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220509
+  machineType: t3a.large
+  maxSize: 3
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: jhub-user-nodes
+    hub.jupyter.org/node-purpose: user
+  role: Node
+  subnets:
+    - us-east-1a
+  cloudLabels:
+    k8s.io/cluster-autoscaler/cluster.internationalbrainlab.org: owned
+    k8s.io/cluster-autoscaler/enabled: 'true'
+  rootVolumeSize: 64
+  taints:
+    - hub.jupyter.org/dedicated=user:NoSchedule
+

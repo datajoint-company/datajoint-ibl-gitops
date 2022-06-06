@@ -1,0 +1,17 @@
+node_pools:
+    - name: default-master
+      machine_size: large
+      count.min: "1"
+      count.max: "2"
+      root_volume_size: "30"
+    - name: default-node
+      machine_size: large
+      count.min: "1"
+      count.max: "6"
+      root_volume_size: "64"
+    - name: jhub-user
+      machine_size: large
+      count.min: "1"
+      count.max: "3"
+      root_volume_size: "64"
+
