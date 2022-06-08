@@ -21,7 +21,7 @@ spec:
           servicePort: 3333
   tls:
     - hosts:
-      - data-m10.internationalbrainlab.org
+      - data-m11.internationalbrainlab.org
       secretName: ibl-node-server-tls
 ...
 ---
@@ -44,6 +44,6 @@ spec:
           servicePort: 9000
   tls:
     - hosts:
-      - data-m10.internationalbrainlab.org
+      - data-m11.internationalbrainlab.org
       secretName: ibl-frontend-tls
 ...
