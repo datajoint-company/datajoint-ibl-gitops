@@ -1,3 +1,4 @@
+---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -6,7 +7,7 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     # cert-manager.io/cluster-issuer: letsencrypt-staging
-    cert-manager.io/cluster-issuer: self-signed
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
   - host: sciviz-private.internationalbrainlab.org
@@ -16,5 +17,9 @@ spec:
         backend:
           serviceName: sci-viz
           servicePort: http
+  tls:
+    - hosts:
+      - sciviz-private.internationalbrainlab.org
+      secretName: sci-viz-tls
 ...
 
