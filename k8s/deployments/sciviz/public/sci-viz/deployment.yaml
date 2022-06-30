@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sci-viz-deployment
+  labels:
+    app: sci-viz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sci-viz
+  template:
+    metadata:
+      labels:
+        app: sci-viz
+    spec:
+      containers:
+      - name: sci-viz
+        image: jverswijver/sci-viz:0.1.3-beta.5
+        env:
+          - name: CHOKIDAR_USEPOLLING
+            value: "true"
+          - name: REACT_APP_DJSCIVIZ_BACKEND_PREFIX
+            value: "/api"
+          - name: DJSCIVIZ_SPEC_PATH
+            value: "/main/specs/sci-viz-config.yaml"
+        command: ["/bin/sh"]
+        args: ["-c","sh sci-viz-hotreload-dev.sh"]
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - name: spec
+            mountPath: "/main/specs"
+            readOnly: true
+          - name: logo
+            mountPath: "/main/src/IBLlogo.png"
+            readOnly: true
+            subPath: "IBLlogo.png"
+          - name: brainbow
+            mountPath: "/main/src/home_ibl_brainbow.jpg"
+            readOnly: true
+            subPath: "home_ibl_brainbow.jpg"
+      volumes:
+      - name: spec
+        configMap:
+          name: sci-viz-config
+      - name: logo
+        configMap:
+          name: ibl-logo
+      - name: brainbow
+        configMap:
+          name: brainbow
+...
+
