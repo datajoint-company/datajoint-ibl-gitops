@@ -12,7 +12,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   rules:
-  - host: djcompute-m12.internationalbrainlab.org
+  - host: djcompute-m11.internationalbrainlab.org
     http:
       paths:
       - path: /api(/|$)(.*) 
@@ -21,7 +21,7 @@ spec:
           servicePort: 3333
   tls:
     - hosts:
-      - djompute-m12.internationalbrainlab.org
+      - djompute-m11.internationalbrainlab.org
       secretName: ibl-node-server-tls
 ...
 ---
@@ -36,7 +36,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   rules:
-  - host: djcompute-m12.internationalbrainlab.org
+  - host: djcompute-m11.internationalbrainlab.org
     http:
       paths:
       - backend:
@@ -44,6 +44,6 @@ spec:
           servicePort: 9000
   tls:
     - hosts:
-      - djcompute-m12.internationalbrainlab.org
+      - djcompute-m11.internationalbrainlab.org
       secretName: ibl-frontend-tls
 ...

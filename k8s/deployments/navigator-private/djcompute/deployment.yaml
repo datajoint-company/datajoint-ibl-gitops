@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: iblapi
-          image: registry.vathes.com/ibl-navigator/iblapi:v0.6.1
+          image: registry.vathes.com/ibl-navigator/iblapi:v0.6.2
           env:
           - name: DJ_HOST
             value: "datajoint.internationalbrainlab.org"
@@ -61,10 +61,10 @@ spec:
     spec:
       containers:
         - name: ibl-frontend
-          image: registry.vathes.com/ibl-navigator/frontend:v0.5.2-public
+          image: registry.vathes.com/ibl-navigator/frontend:v0.5.2
           env:
           - name: PROD_NODE_BACKEND
-            value: "https://djcompute-m12.internationalbrainlab.org/api"
+            value: "https://djcompute.internationalbrainlab.org/api"
           ports:
             - containerPort: 9000
               protocol: TCP
@@ -96,7 +96,7 @@ spec:
     spec:
       containers:
         - name: ibl-node-server
-          image: registry.vathes.com/ibl-navigator/node-server:v0.4.1-public
+          image: registry.vathes.com/ibl-navigator/node-server:v0.4.1
           env:
           - name: NODE_ENV
             value: "development"
