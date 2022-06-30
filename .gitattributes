@@ -1,5 +1,6 @@
 #pattern  filter=crypt diff=crypt merge=crypt
 k8s/deployments/navigator-public/secret.yaml filter=crypt diff=crypt merge=crypt
+k8s/deployments/navigator-private/secret.yaml filter=crypt diff=crypt merge=crypt
 k8s/deployments/sciviz/secret.yaml filter=crypt diff=crypt merge=crypt
 #k8s/deployments/jupyterhub/.env filter=crypt diff=crypt merge=crypt
 k8s/cluster/cluster.internationalbrainlab.org.yaml filter=crypt diff=crypt merge=crypt
