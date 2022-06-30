@@ -9,16 +9,12 @@ metadata:
     cert-manager.io/cluster-issuer: self-signed
 spec:
   rules:
-  - host: sciviz.internationalbrainlab.org
+  - host: sciviz-private.internationalbrainlab.org
     http:
       paths:
       - path: /
         backend:
           serviceName: sci-viz
           servicePort: http
-            #  tls:
-            #    - hosts:
-            #      - labbook.datajoint.io
-            #      secretName: labbook-tls         
 ...
 
