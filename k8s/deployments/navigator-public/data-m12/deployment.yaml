@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: iblapi
-          image: registry.vathes.com/ibl-navigator/iblapi:v0.3.3-public
+          image: registry.vathes.com/ibl-navigator/iblapi:v0.3.4-public
           env:
           - name: DJ_HOST
             value: "datajoint-public.internationalbrainlab.org"
@@ -69,7 +69,7 @@ spec:
     spec:
       containers:
         - name: ibl-frontend
-          image: registry.vathes.com/ibl-navigator/frontend:v0.3.3-public
+          image: registry.vathes.com/ibl-navigator/frontend:v0.3.4-public
           imagePullPolicy: Always
           env:
           - name: PROD_NODE_BACKEND
@@ -105,7 +105,7 @@ spec:
     spec:
       containers:
         - name: ibl-node-server
-          image: registry.vathes.com/ibl-navigator/node-server:v0.3.3-public
+          image: registry.vathes.com/ibl-navigator/node-server:v0.3.4-public
           env:
           - name: NODE_ENV
             value: "development"
