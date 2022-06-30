@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: iblapi
-          image: registry.vathes.com/ibl-navigator/iblapi:v0.6.1
+          image: registry.vathes.com/ibl-navigator/iblapi:v0.6.2
           env:
           - name: DJ_HOST
             value: "datajoint.internationalbrainlab.org"
