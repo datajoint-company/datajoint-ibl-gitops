@@ -70,7 +70,6 @@ spec:
       containers:
         - name: ibl-frontend
           image: registry.vathes.com/ibl-navigator/frontend:v0.3.4-public
-          imagePullPolicy: Always
           env:
           - name: PROD_NODE_BACKEND
             value: "https://data-m12.internationalbrainlab.org/api"
