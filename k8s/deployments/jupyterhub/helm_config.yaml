@@ -16,7 +16,7 @@ ingress:
     - jupyter-test.internationalbrainlab.org
   tls:
     - hosts:
-      - jupyter-test.internationalbrainlab.org
+        - jupyter-test.internationalbrainlab.org
       secretName: jupyterhub-tls
 hub:
   db:
@@ -25,7 +25,7 @@ hub:
     # docs recommend setting `60 <= pool_recycle <= 300` on server-side
     # (https://jupyterhub.readthedocs.io/en/stable/reference/database.html#mysql-mariadb)
     url: mysql+pymysql://<db-username>:<db-password>@<db-hostname>:<db-port>/<db-name>
-    upgrade: true  # optional flag that allows jupyter to `ALTER` tables when upgrading
+    upgrade: true # optional flag that allows jupyter to `ALTER` tables when upgrading
   config:
     GitHubOAuthenticator:
       client_id: null
@@ -37,7 +37,7 @@ hub:
   # allowNamedServers: true
   # templatePaths:
   #   - /tmp/jupyterhub/custom/templates
-  extraConfig: 
+  extraConfig:
     Base: |
       import z2jh
       from pathlib import Path
@@ -183,7 +183,7 @@ cull:
 
 #     <head>
 #     <title>DataJoint Compute</title>
-#     <link rel="icon" type="image/png" 
+#     <link rel="icon" type="image/png"
 #       sizes="32x32" href="https://accounts.datajoint.io/static/favicons/favicon-32x32.png">
 #     <meta name="description" content="An interactive, web-based, DataJoint compute environment launcher.">
 #     <style>
@@ -225,7 +225,7 @@ cull:
 #     {{ super() }}
 #     <style>
 #     .branding img {
-#         display: block; 
+#         display: block;
 #         width: 350px;
 #         /* top right bottom left */
 #         margin: 0 auto 0 auto;
