@@ -96,6 +96,7 @@ hub:
           allowed_users = {
               'private': [
                   'guzman-raphael',
+                  'ernaldis',
               ]
           }
 
