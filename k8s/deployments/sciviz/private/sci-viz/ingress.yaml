@@ -6,11 +6,11 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    cert-manager.io/cluster-issuer: letsencrypt-staging
-      #    cert-manager.io/cluster-issuer: letsencrypt-prod
+      #    cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
-  - host: sciviz-private.internationalbrainlab.org
+  - host: djcompute-sciviz.internationalbrainlab.org
     http:
       paths:
       - path: /
@@ -19,7 +19,7 @@ spec:
           servicePort: http
   tls:
     - hosts:
-      - sciviz-private.internationalbrainlab.org
+      - djcompute-sciviz.internationalbrainlab.org
       secretName: sci-viz-tls
 ...
 

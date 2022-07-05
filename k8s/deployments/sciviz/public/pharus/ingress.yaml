@@ -7,11 +7,11 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-    cert-manager.io/cluster-issuer: self-signed
-      #    cert-manager.io/cluster-issuer: letsencrypt-prod
+      #    cert-manager.io/cluster-issuer: self-signed
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
-  - host: sciviz-public.internationalbrainlab.org
+  - host: data-sciviz.internationalbrainlab.org
     http:
       paths:
       - path: /api(/|$)(.*)
@@ -20,6 +20,6 @@ spec:
           servicePort: http
   tls:
     - hosts:
-      - sciviz-public.internationalbrainlab.org
+      - data-sciviz.internationalbrainlab.org
       secretName: sciviz-tls
 ...
