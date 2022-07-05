@@ -167,9 +167,11 @@ hub:
                           'JUPYTERHUB_SINGLEUSER_APP': 'jupyter_server.serverapp.ServerApp',
                           'Djlabhub_ServerName': 'private',
                           'DJ_HOST': 'datajoint.internationalbrainlab.org',
-                          'Djlabhub_NotebookRepo_Target': ('https://github.com/guzman-raphael'
-                                                          '/playground_tutorial'),
-                          'Djlabhub_NotebookRepo_Subpath': '.',
+                            #                          'Djlabhub_NotebookRepo_Target': ('https://github.com/guzman-raphael'
+                            #                                                           '/playground_tutorial'),
+                          'Djlabhub_NotebookRepo_Target': '--branch new-ingestion https://github.com/datajoint-company/IBL-pipeline',
+                            #                          'Djlabhub_NotebookRepo_Target': 'https://github.com/datajoint-company/IBL-pipeline',                                
+                          'Djlabhub_NotebookRepo_Subpath': './notebooks/notebooks_tutorial',
                           'FILEPATH_FEATURE_SWITCH': 'TRUE',
                           'ADAPTED_TYPE_SWITCH': 'TRUE',
                       },
@@ -213,6 +215,7 @@ hub:
       # login_page.write_text(z2jh.get_config('custom.login_page'))
       # Set profile options
       c.KubeSpawner.options_form = custom_options_form
+      c.KubeSpawner.http_timeout = 300
 prePuller:
   hook:
     enabled: false
