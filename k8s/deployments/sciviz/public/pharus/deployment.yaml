@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: pharus
-        image: jverswijver/pharus:0.4.2-Beta.2
+        image: jverswijver/pharus:0.4.2-Beta.4
         env:
         - name: PHARUS_PORT
           value: "5000"
