@@ -1,0 +1,341 @@
+# install|update: source k8s/deployments/jupyterhub/.env && helm upgrade --install jupyterhub jupyterhub/jupyterhub -n jhub --create-namespace --values k8s/deployments/jupyterhub/helm_config.yaml --set hub.config.GitHubOAuthenticator.client_id=${GITHUB_CLIENT_ID} --set hub.config.GitHubOAuthenticator.client_secret=${GITHUB_CLIENT_SECRET} --set hub.db.url=${JUPYTERHUB_DB_URL} --version "1.1.3" --devel --timeout 1h --debug #--wait --dry-run
+# remove: helm delete jupyterhub -n jhub # && kubectl delete ns jupyterhub
+# note: deleting namespace is currently permanently breaking dns resolution for that ns (matching name)
+proxy:
+  service:
+    type: NodePort
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    #    cert-manager.io/cluster-issuer: letsencrypt-staging
+    #    cert-manager.io/cluster-issuer: self-signed
+  hosts:
+    - jupyter.internationalbrainlab.org
+  tls:
+    - hosts:
+        - jupyter.internationalbrainlab.org
+      secretName: jupyterhub-tls
+hub:
+  db:
+    type: mysql
+    # database needs to exist
+    # docs recommend setting `60 <= pool_recycle <= 300` on server-side
+    # (https://jupyterhub.readthedocs.io/en/stable/reference/database.html#mysql-mariadb)
+    url: mysql+pymysql://<db-username>:<db-password>@<db-hostname>:<db-port>/<db-name>
+    upgrade: true # optional flag that allows jupyter to `ALTER` tables when upgrading
+  config:
+    GitHubOAuthenticator:
+      client_id: null
+      client_secret: null
+      # the callback url must match the value found in the oauth app on github
+      oauth_callback_url: https://jupyter.internationalbrainlab.org/hub/oauth_callback
+    JupyterHub:
+      authenticator_class: github
+  # redirectToServer: false
+  # allowNamedServers: true
+  # templatePaths:
+  #   - /tmp/jupyterhub/custom/templates
+  extraConfig:
+    Base: |
+      import z2jh
+      from pathlib import Path
+
+      # Define environment option logic
+      async def custom_options_form(spawner):
+          default_profile = {
+              'display_name': 'PUBLIC environment',
+              'slug': 'public',
+              'description': ('This Jupyter environment contains public notebooks.'),
+              'kubespawner_override': {
+                  'environment': {
+                      'NEW_USER': spawner.user.name,
+                      'JUPYTERHUB_SINGLEUSER_APP': 'jupyter_server.serverapp.ServerApp',
+                      'Djlabhub_ServerName': 'public',
+                      'DJ_HOST': 'datajoint-public.internationalbrainlab.org',
+                      'DJ_USER': 'ibl-public',
+                      'DJ_PASS': 'ibl-public',
+                      'Djlabhub_NotebookRepo_Target': ('https://github.com/guzman-raphael'
+                                                       '/playground_tutorial'),
+                      'Djlabhub_NotebookRepo_Subpath': '.',
+                      'FILEPATH_FEATURE_SWITCH': 'TRUE',
+                      'ADAPTED_TYPE_SWITCH': 'TRUE',
+                  },
+                  'image': 'datajoint/djlabhub:1.4.2-py3.9-debian',
+                  'gid': 999,  # this is the 'anaconda' group's GID in the image
+                  'volumes': [
+                      {
+                          'name': 'nbdata',
+                          'persistentVolumeClaim': {
+                              'claimName': 'claim-{username}{servername}',
+                          },
+                      },
+                  ],
+                  'volume_mounts': [
+                      {
+                          'name': 'nbdata',
+                          'subPath': 'home_public',
+                          'mountPath': '/home/.anaconda',
+                      },
+                      {
+                          'name': 'nbdata',
+                          'subPath': 'common',
+                          'mountPath': '/home/common',
+                      },
+                  ],
+                  'cpu_limit': 2.0,
+                  'cpu_guarantee': 0.05,
+                  'mem_limit': '2G',
+                  'mem_guarantee': '256M',
+                  'default_url': '/lab/tree/README.md',
+              },
+              'default': True,
+          }
+
+          allowed_users = {
+              'private': [
+                  'guzman-raphael',
+                  'ernaldis',
+                  'iamamutt',
+                  'nbonacchi',
+                  'oliche',
+                  'ttngu207',
+                  'yambottle',
+                  'alejandropan',
+                  'alessandro2019-hash',
+                  'anne-urai',
+                  'berkgercek',
+                  'catubc',
+                  'charlinetess',
+                  'cmlangdon',
+                  'correges',
+                  'cskrasniak',
+                  'csmfindling',
+                  'dimitri-yatsenko',
+                  'eejd',
+                  'ekellbuch',
+                  'eywalker',
+                  'gaellechapuis',
+                  'guidomeijer',
+                  'hernandomv',
+                  'ibldan',
+                  'ineslaranjeira',
+                  'jeanpaulnc',
+                  'joanacatarino',
+                  'juhuntenburg',
+                  'julienboussard',
+                  'k1o0',
+                  'kainylund',
+                  'karolinasocha',
+                  'kceniab',
+                  'khanalanup',
+                  'kushbanga',
+                  'lacerbi',
+                  'lafresil',
+                  'marsataheri',
+                  'mayofaulkner',
+                  'mdavatol',
+                  'mdmelin',
+                  'micheleangelofabbri',
+                  'mschart',
+                  'nantille',
+                  'naureeng',
+                  'njmiska',
+                  'noamroth',
+                  'rylanschaeffer',
+                  'samupicard',
+                  'sebastianbruijns',
+                  'stevenjwest',
+                  'themattinthehatt',
+                  'tsukasar',
+                  'ttngu201',
+                  'valagui',
+                  'yeebc',
+                  'zashwood',
+              ]
+          }
+
+          profile_map = {
+              'private': {
+                  'display_name': 'PRIVATE environment',
+                  'slug': 'private',
+                  'description': ('This Jupyter environment contains private notebooks.'),
+                  'kubespawner_override': {
+                      'environment': {
+                          'NEW_USER': spawner.user.name,
+                          'JUPYTERHUB_SINGLEUSER_APP': 'jupyter_server.serverapp.ServerApp',
+                          'Djlabhub_ServerName': 'private',
+                          'DJ_HOST': 'datajoint.internationalbrainlab.org',
+                            #                          'Djlabhub_NotebookRepo_Target': ('https://github.com/guzman-raphael'
+                            #                                                           '/playground_tutorial'),
+                          'Djlabhub_NotebookRepo_Target': '--branch new-ingestion https://github.com/datajoint-company/IBL-pipeline',
+                            #                          'Djlabhub_NotebookRepo_Target': 'https://github.com/datajoint-company/IBL-pipeline',                                
+                          'Djlabhub_NotebookRepo_Subpath': './notebooks/notebooks_tutorial',
+                          'FILEPATH_FEATURE_SWITCH': 'TRUE',
+                          'ADAPTED_TYPE_SWITCH': 'TRUE',
+                      },
+                      'image': 'datajoint/djlabhub:1.4.2-py3.9-debian',
+                      'gid': 999,  # this is the 'anaconda' group's GID in the image
+                      'volumes': [
+                          {
+                              'name': 'nbdata',
+                              'persistentVolumeClaim': {
+                                  'claimName': 'claim-{username}{servername}',
+                              },
+                          },
+                      ],
+                      'volume_mounts': [
+                          {
+                              'name': 'nbdata',
+                              'subPath': 'home_private',
+                              'mountPath': '/home/.anaconda',
+                          },
+                          {
+                              'name': 'nbdata',
+                              'subPath': 'common',
+                              'mountPath': '/home/common',
+                          },
+                      ],
+                      'cpu_limit': 2.0,
+                      'cpu_guarantee': 0.05,
+                      'mem_limit': '2G',
+                      'mem_guarantee': '256M',
+                      'default_url': '/lab/tree/README.md',
+                  },
+              },
+          }
+
+          spawner.profile_list = [default_profile] + [v for k, v in profile_map.items() if spawner.user.name in allowed_users[k]]
+          return spawner._options_form_default()
+
+      # Add login page to template directory
+      # login_page = Path('/tmp/jupyterhub/custom/templates/login.html')
+      # login_page.parent.mkdir(exist_ok=True, parents=True)
+      # login_page.write_text(z2jh.get_config('custom.login_page'))
+      # Set profile options
+      c.KubeSpawner.options_form = custom_options_form
+      c.KubeSpawner.http_timeout = 300
+prePuller:
+  hook:
+    enabled: false
+scheduling:
+  podPriority:
+    enabled: true
+  userPlaceholder:
+    enabled: true
+    replicas: 5
+    # replicas: 20
+  userPods:
+    nodeAffinity:
+      matchNodePurpose: require
+  userScheduler:
+    enabled: true
+cull:
+  enabled: true
+  timeout: 3600
+  every: 300
+  maxAge: 43200
+# custom:
+#   login_page: |
+#     {% extends "templates/login.html" %}
+#     {% block login %}
+
+#     <head>
+#     <title>DataJoint Compute</title>
+#     <link rel="icon" type="image/png"
+#       sizes="32x32" href="https://accounts.datajoint.io/static/favicons/favicon-32x32.png">
+#     <meta name="description" content="An interactive, web-based, DataJoint compute environment launcher.">
+#     <style>
+#     .vertical-center {
+#         margin: 0;
+#         position: absolute;
+#         top: 50%;
+#         -ms-transform: translateY(-50%);
+#         transform: translateY(-50%);
+#     }
+#     </style>
+#     </head>
+
+#     <div class='container branding'>
+#     <div class="vertical-center">
+#     <img
+#     src='https://accounts.datajoint.io/static/images/dj2-medium.png'>
+#     <p align="center">
+#         <br>
+#         Welcome to DataJoint's Public Jupyter environment!<br>
+#         Here you may explore what DataJoint Python can do<br>
+#         via Jupyter Notebooks. All that is needed is a<br>
+#         <a href="https://accounts.datajoint.io/">DataJoint</a> login.<br>
+#         <br>
+#         When you are done, feel free to join the community<br>
+#         in our <a href="https://join.slack.com/t/datajoint/shared_invite/zt-3pioa7mu-R_G_z07arbgLelDuDxotdg">DataJoint Slack</a> so you can let us know<br>
+#         what you think!<br>
+#         <br>
+#         Happy DataJoint'ing!!<br>
+#         <br>
+#     </p>
+#     {{ super() }}
+#     </div>
+#     </div>
+
+#     {% endblock %}
+
+#     {% block stylesheet %}
+#     {{ super() }}
+#     <style>
+#     .branding img {
+#         display: block;
+#         width: 350px;
+#         /* top right bottom left */
+#         margin: 0 auto 0 auto;
+#     }
+#     #login-main .auth-form-body {
+#         border-color: rgb(0, 124, 186);
+#         color: white;
+#     }
+#     #login-main {
+#         margin-top: 1%;
+#         height: 100%;
+#     }
+#     footer {
+#         border-top: 1px solid silver;
+#         padding: 10px;
+#         bottom: 0;
+#         position: fixed;
+#         width: 100%;
+#     }
+#     footer p{
+#         margin: 0 auto 0 auto;
+#         text-align: center;
+#     }
+#     #login-main form {
+#         vertical-align: top;
+#     }
+#     #login-main .auth-form-header {
+#         color: white;
+#         background: rgb(219, 170, 0);
+#         border: 1px solid;
+#         border-color: rgb(0, 124, 186);
+#     }
+#     #insecure-login-warning {
+#         color: black;
+#     }
+#     .btn-jupyter.active, .btn-jupyter:active, .open>.dropdown-toggle.btn-jupyter {
+#         box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px #a88400;
+#         border-color: #a88400;
+#         outline-color: #a88400;
+#     }
+#     #login-main .form-control:focus, #login-main input[type=submit]:focus {
+#         box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgb(219, 170, 0);
+#         border-color: rgb(219, 170, 0);
+#         outline-color: rgb(219, 170, 0);
+#     }
+#     .btn-jupyter {
+#         color: #fff;
+#         background-color: rgb(219, 170, 0);
+#         border-color: rgb(219, 170, 0);
+#     }
+#     </style>
+#     {% endblock %}
