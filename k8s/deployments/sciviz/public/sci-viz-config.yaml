@@ -1,5 +1,5 @@
-# kubectl -n sci-viz create configmap sci-viz-config --from-file=sci-viz-config.yaml
-# kubectl -n sci-viz create configmap sci-viz-config --from-file=sci-viz-config.yaml -o yaml --dry-run=client | kubectl -n sci-viz apply -f -
+# kubectl -n sci-viz-public create configmap sci-viz-config --from-file=sciviz_spec_public.yaml
+# kubectl -n sci-viz-public create configmap sci-viz-config --from-file=sciviz_spec_public.yaml -o yaml --dry-run=client | kubectl -n sci-viz-public apply -f -
 version: "v0.0.0"
 LabBook: null
 SciViz: # top level tab
@@ -41,7 +41,7 @@ SciViz: # top level tab
               link = record[0][6]
               compiled_link = s3_client.presigned_get_object(self.static_variables['s3_bucket'], link)
               event = record[0][3]
-              
+
               peth_template['data'][0]['x'] = [plot_xlim[0]-0.2, plot_xlim[0]-0.1]
               peth_template['data'][0]['y'] = [plot_ylim[0]-0.2]
               peth_template['data'][0]['z'] = z_range
@@ -113,7 +113,7 @@ SciViz: # top level tab
                                           access_key=self.static_variables['s3_access_key'],
                                           secret_key=self.static_variables['s3_secret_key'],
                                           secure=True)
-              
+
               tdr_template = record[0][15]
               trial_contrast = record[0][13]
               trial_feedback = record[0][12]
@@ -192,6 +192,11 @@ SciViz: # top level tab
               # this example of image_route has the image in the /src dir
               image_route: ../../home_ibl_brainbow.jpg
               text: |
+                # Welcome!
+
+                To see full plotting for sessions go to [this link](sessionplots?subject_uuid=70bf8cbd-d312-4654-a4ea-3a21ea2f541b&session_start_time=1600714937)
+
+                To see full plotting for a subject go to [this link](mouseplots?subject_uuid=70bf8cbd-d312-4654-a4ea-3a21ea2f541b)
 
                 # International Brain Laboratory Behavioral Data Portal
 
@@ -225,7 +230,7 @@ SciViz: # top level tab
                     b. Read the README.
 
                     c. Click on public_notebooks/Explore IBL pipeline to run the notebooks (one of which replicates Figure 2 of The International Brain Laboratory et al. 2020).
-                  
+
                 3. **Access the data locally using DataJoint**. See the detailed instructions.
 
                 4. **Access the data via a direct download from your browser** without running any code. Simply load a Google Chrome browser window and use the provided link from the Behavior paper data URL.
@@ -274,19 +279,6 @@ SciViz: # top level tab
                 Once the animal is placed on the ephys rig, it undergoes a habituation to that rig until it is deemed ready for electrophysiological recordings to be conducted (**ready for neuropixels recording**). Once a recording has been completed, the behavior quality is validated for downstream analysis (**good enough for brainwide map**). The associated methods and protocols to habituate a mouse to the ephys rig and perform the Neuropixels recording have not been yet publicly released; please see the figure below for a preliminary introduction to our full training pipeline.
 
                 ![flowchart](https://data.internationalbrainlab.org/assets/images/training_pipeline.svg)
-
-            comp4:
-              x: 0
-              y: 6.7
-              height: 0.33 
-              width: 1
-              type: markdown
-              text: |
-                # Welcome!
-
-                To see full plotting for sessions go to [this link](sessionplots?subject_uuid=70bf8cbd-d312-4654-a4ea-3a21ea2f541b&session_start_time=1600714937)
-
-                To see full plotting for a subject go to [this link](mouseplots?subject_uuid=70bf8cbd-d312-4654-a4ea-3a21ea2f541b)
 
     Mice:
       route: /mice
@@ -390,7 +382,7 @@ SciViz: # top level tab
                     return dict(**kwargs)
               dj_query: >
                 def dj_query(ibl_plotting_behavior):
-                    plot = ibl_plotting_behavior.CumulativeSummary.TrialCountsSessionDuration
+                    plot = ibl_plotting_behavior.CumulativeSummary.TrialCountsSessionDuration & ibl_plotting_behavior.SubjectLatestDate
                     return dict(query=plot, fetch_args=['trial_counts_session_duration'])
             Performanceandmedianreactiontime:
               route: /Performanceandmedianreactiontime
@@ -404,7 +396,7 @@ SciViz: # top level tab
                     return dict(**kwargs)
               dj_query: >
                 def dj_query(ibl_plotting_behavior):
-                    plot = ibl_plotting_behavior.CumulativeSummary.PerformanceReactionTime
+                    plot = ibl_plotting_behavior.CumulativeSummary.PerformanceReactionTime & ibl_plotting_behavior.SubjectLatestDate
                     return dict(query=plot, fetch_args=['performance_reaction_time'])
             FitParametersPlot:
               route: /FitParametersPlot
@@ -418,7 +410,7 @@ SciViz: # top level tab
                     return dict(**kwargs)
               dj_query: >
                 def dj_query(ibl_plotting_behavior):
-                    plot = ibl_plotting_behavior.CumulativeSummary.FitPars
+                    plot = ibl_plotting_behavior.CumulativeSummary.FitPars & ibl_plotting_behavior.SubjectLatestDate
                     return dict(query=plot, fetch_args=['fit_pars'])
             ContrastHeatmap:
               route: /ContrastHeatmap
@@ -432,7 +424,7 @@ SciViz: # top level tab
                     return dict(**kwargs)
               dj_query: >
                 def dj_query(ibl_plotting_behavior):
-                    plot = ibl_plotting_behavior.CumulativeSummary.ContrastHeatmap
+                    plot = ibl_plotting_behavior.CumulativeSummary.ContrastHeatmap & ibl_plotting_behavior.SubjectLatestDate
                     return dict(query=plot, fetch_args=['contrast_heatmap'])
         grid2:
           type: dynamic
@@ -731,143 +723,3 @@ SciViz: # top level tab
                 "0.125": "trial_contrast=0.125"
                 "0.25": "trial_contrast=0.25"
                 "1": "trial_contrast=1"
-    Daily Summary:
-      route: /summary
-      grids:
-        mygrid:
-          type: static
-          columns: 3
-          row_height: 500
-          components:
-            Click on table row to see plots for that subject:
-              route: /summarytable
-              type: table
-              x: 0
-              y: 0
-              height: 1
-              width: 3
-              channel: mytable
-              restriction: >
-                def restriction(**kwargs):
-                    return dict(**kwargs)
-              dj_query: >
-                def dj_query(ibl_plotting_behavior, ibl_subject):
-                    summary = ibl_plotting_behavior.CumulativeSummary
-                    subject = ibl_subject.Subject
-                    q = subject*summary & subject.aggr(summary, latest_date='MAX(latest_date)')
-                    return dict(query=q, fetch_args={'order_by': 'latest_date DESC'})
-            ContrastHeatmapSummary:
-              route: /ContrastHeatmapSummary
-              type: plot:plotly:stored_json
-              x: 0
-              y: 1
-              height: 1
-              width: 1
-              channels: [mytable]
-              restriction: >
-                def restriction(**kwargs):
-                    return dict(**kwargs)
-              dj_query: >
-                def dj_query(ibl_plotting_behavior):
-                    plot = ibl_plotting_behavior.CumulativeSummary.ContrastHeatmap
-                    return dict(query=plot, fetch_args=['contrast_heatmap'])
-            PerformanceReactionTimeSummary:
-              route: /PerformanceReactionTimeSummary
-              type: plot:plotly:stored_json
-              x: 1
-              y: 1
-              height: 1
-              width: 1
-              channels: [mytable]
-              restriction: >
-                def restriction(**kwargs):
-                    return dict(**kwargs)
-              dj_query: >
-                def dj_query(ibl_plotting_behavior):
-                    plot = ibl_plotting_behavior.CumulativeSummary.PerformanceReactionTime
-                    return dict(query=plot, fetch_args=['performance_reaction_time'])
-            TrialCountsSessionDuration:
-              route: /TrialCountsSessionDuration
-              type: plot:plotly:stored_json
-              x: 2
-              y: 1
-              height: 1
-              width: 1
-              channels: [mytable]
-              restriction: >
-                def restriction(**kwargs):
-                    return dict(**kwargs)
-              dj_query: >
-                def dj_query(ibl_plotting_behavior):
-                    plot = ibl_plotting_behavior.CumulativeSummary.TrialCountsSessionDuration
-                    return dict(query=plot, fetch_args=['trial_counts_session_duration'])
-
-
-    # Daily Summary:
-    #   route: /summary
-    #   grids:
-    #     mygrid:
-    #       type: dynamic
-    #       route: /dgridsummary
-    #       columns: 2
-    #       row_height: 1300
-    #       restriction: >
-    #         def restriction(**kwargs):
-    #             return dict(**kwargs)
-    #       dj_query: >
-    #         def dj_query(ibl_plotting_behavior):
-    #             q = ibl_plotting_behavior.CumulativeSummary
-
-    #             return dict(query=(q), fetch_args={'order_by': 'latest_date DESC'})
-    #       component_templates:
-    #         # metadata:
-    #         #   route: /summarymetadata
-    #         #   type: metadata
-    #         #   restriction: >
-    #         #     def restriction(**kwargs):
-    #         #         return dict(**kwargs)
-    #         #   dj_query: >
-    #         #     def dj_query(ibl_plotting_behavior):
-    #         #         plot = ibl_plotting_behavior.DailyLabSummary.SubjectSummary
-    #         #         return dict(query=plot, fetch_args=[])
-    #         ContrastHeatmapSummary:
-    #           route: /ContrastHeatmapSummary
-    #           type: plot:plotly:stored_json
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.ContrastHeatmap
-    #                 return dict(query=plot, fetch_args=['contrast_heatmap'])
-    #         PerformanceReactionTimeSummary:
-    #           route: /PerformanceReactionTimeSummary
-    #           type: plot:plotly:stored_json
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.PerformanceReactionTime
-    #                 return dict(query=plot, fetch_args=['performance_reaction_time'])
-    #         TrialCountsSessionDuration:
-    #           route: /TrialCountsSessionDuration
-    #           type: plot:plotly:stored_json
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.TrialCountsSessionDuration
-    #                 return dict(query=plot, fetch_args=['trial_counts_session_duration'])
-    #-----------------Only for internal navigator-----------------
-    #  WaterWeightSummary:
-    #   route: /WaterWeightSummary
-    #   type: plot:plotly:stored_json
-    #   restriction: >
-    #     def restriction(**kwargs):
-    #         return dict(**kwargs)
-    #   dj_query: >
-    #     def dj_query(ibl_plotting_behavior):
-    #         plot = ibl_plotting_behavior.CumulativeSummary.WaterWeight
-    #         return dict(query=plot, fetch_args=['water_weight'])
