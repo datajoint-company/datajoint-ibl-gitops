@@ -7,12 +7,11 @@ metadata:
     app: iblapi-svc
 spec:
   ports:
-  - port: 5000
-    targetPort: 5000
+    - port: 5000
+      targetPort: 5000
   selector:
     app: iblapi
   type: ClusterIP
-...
 ---
 apiVersion: v1
 kind: Service
@@ -22,12 +21,11 @@ metadata:
     app: ibl-node-server-svc
 spec:
   ports:
-  - port: 3333
-    targetPort: 3333
+    - port: 3333
+      targetPort: 3333
   selector:
     app: ibl-node-server
   type: ClusterIP
-...
 ---
 apiVersion: v1
 kind: Service
@@ -37,9 +35,8 @@ metadata:
     app: ibl-frontend-svc
 spec:
   ports:
-  - port: 9000
-    targetPort: 9000
+    - port: 9000
+      targetPort: 9000
   selector:
     app: ibl-frontend
   type: ClusterIP
-...

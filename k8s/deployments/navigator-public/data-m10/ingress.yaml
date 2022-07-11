@@ -12,18 +12,17 @@ metadata:
       #    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   rules:
-  - host: data-m10.internationalbrainlab.org
-    http:
-      paths:
-      - path: /api(/|$)(.*) 
-        backend:
-          serviceName: ibl-node-server
-          servicePort: 3333
+    - host: data-m10.internationalbrainlab.org
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            backend:
+              serviceName: ibl-node-server
+              servicePort: 3333
   tls:
     - hosts:
-      - data-m10.internationalbrainlab.org
+        - data-m10.internationalbrainlab.org
       secretName: ibl-node-server-tls
-...
 ---
 apiVersion: extensions/v1beta1 #networking.k8s.io/v1 Ingress
 kind: Ingress
@@ -36,14 +35,13 @@ metadata:
       #    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   rules:
-  - host: data-m10.internationalbrainlab.org
-    http:
-      paths:
-      - backend:
-          serviceName: ibl-frontend
-          servicePort: 9000
+    - host: data-m10.internationalbrainlab.org
+      http:
+        paths:
+          - backend:
+              serviceName: ibl-frontend
+              servicePort: 9000
   tls:
     - hosts:
-      - data-m10.internationalbrainlab.org
+        - data-m10.internationalbrainlab.org
       secretName: ibl-frontend-tls
-...
