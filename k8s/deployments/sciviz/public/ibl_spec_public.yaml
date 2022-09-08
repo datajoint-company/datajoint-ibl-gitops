@@ -74,7 +74,7 @@ SciViz: # top level tab
               sat_template['layout']['images'][0]['source'] = compiled_link
               sat_template['layout']['images'][0]['sizex'] = plot_xlim[1] - plot_xlim[0]
               sat_template['layout']['images'][0]['sizey'] = plot_ylim[1] - plot_ylim[0]
-              sat_template['layou']['images'][0]['x'] = plot_xlim[0]
+              sat_template['layout']['images'][0]['x'] = plot_xlim[0]
               sat_template['layout']['images'][0]['y'] = plot_ylim[1]
               sat_template['layout']['xaxis']['range'] = plot_xlim
               sat_template['layout']['yaxis']['range'] = plot_ylim
@@ -191,12 +191,12 @@ SciViz: # top level tab
                 ## **<span style="text-decoration: underline">View the data</span>**
 
                 **<span style="color:red">Please use Chrome as other browsers are not supported.</span>**       
-                
+
                 Two types of data are viewable through the portal:
                 1. **Electrophysiology data** recorded in the mouse brain during behavior. Neurons are recorded at various locations within the brain using Neuropixels probes, once mice are <span style=text-decoration: underline">experts</span> in the behavioural paradigm described below. Users can view the properties of the recorded neurons (e.g. waveforms), as well as their responses to different stimuli and events ongoing during behavior. The behavior data recorded during the session is also displayed (e.g. psychometric curve).
                 The data available here come from our recent publication ["Reproducibility of in-vivo electrophysiological measurements in mice", The International Brain Laboratory et al., bioRxiv. https://doi.org/10.1101/2022.05.09.491042](https://doi.org/10.1101/2022.05.09.491042).
                 You will also find electrophysiology data associated with 4 additional recordings, each acquired at a different institution, which serve as a teaser in preparation for the full data release expected in late 2022.
-                
+
                 2. **Behavioral data throughout learning** from a standardized training pipeline, implemented across 9 labs in 7 institutions. Mice learn to make decisions that combine incoming visual evidence with internal beliefs about the dynamic structure of the environment. Through this portal, users can view behavioral data from mice throughout their training, and see the transition from novice to expert behavior unfold.
                 The content of this portal reflects the behavioral data associated with 198 mice up until 2020-03-23, as used in [The International Brain Laboratory et al. 2020](https://elifesciences.org/articles/63711).
             comp1:
@@ -208,7 +208,7 @@ SciViz: # top level tab
               text: |
                 ## **<span style="text-decoration: underline">Access the data</span>**
                 Want to do more than just browse IBL data? Please check out our [Introduction to Publicly available IBL data](https://int-brain-lab.github.io/iblenv/public_docs/public_introduction.html) to access and download the data.
-                
+
             comp2:
               x: 0
               y: 1.3
@@ -248,7 +248,7 @@ SciViz: # top level tab
               text: |
                 ## **<span style="text-decoration: underline">Questions</span>**
                 Issues with accessing the data? Email info@internationalbrainlab.org.
-                
+
                 General questions about the paper [The International Brain Laboratory et al. 2020](https://elifesciences.org/articles/63711)? Email info+behavior@internationalbrainlab.org.
 
                 General questions about the paper ["Reproducibility of in-vivo electrophysiological measurements in mice," The International Brain Laboratory et al., 2022](https://www.biorxiv.org/content/10.1101/2022.05.09.491042)? Email info@internationalbrainlab.org.
@@ -267,7 +267,7 @@ SciViz: # top level tab
               height: 1
               width: 1
               link: /mouseplots
-              type: table
+              type: antd-table
               route: /mousetable
               restriction: >
                 def restriction(**kwargs):
@@ -290,7 +290,7 @@ SciViz: # top level tab
               y: 0
               height: 1
               width: 1
-              type: table
+              type: antd-table
               link: /sessionplots
               restriction: >
                 def restriction(**kwargs):
@@ -564,7 +564,7 @@ SciViz: # top level tab
               y: 2
               height: 1
               width: 2
-              type: table
+              type: antd-table
               channel: cluster
               restriction: >
                 def restriction(**kwargs):
@@ -833,4 +833,5 @@ SciViz: # top level tab
     #           dj_query: >
     #             def dj_query(ibl_plotting_behavior):
     #                 plot = ibl_plotting_behavior.CumulativeSummary.TrialCountsSessionDuration
-    #                 return dict(query=plot, fetch_args=['trial_counts_session_duration'])t
+    #                 return dict(query=plot, fetch_args=['trial_counts_session_duration'])
+

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: sci-viz
-        image: jverswijver/sci-viz:0.2.0-prerelease
+        image: jverswijver/sci-viz:0.2.0-prerelease-2
         env:
           - name: CHOKIDAR_USEPOLLING
             value: "true"
