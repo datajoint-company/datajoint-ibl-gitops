@@ -31,6 +31,6 @@ note: deleting namespace is currently permanently breaking dns resolution for th
 Deployments in this project have files split between multiple locations, to allow common files to be used by multiple deployments.
 To apply or delete, run the following:
 ```bash
-( export VISIBILITY=<private | public> && kubectl -n sci-viz-${VISIBILITY} apply -f k8s/deployments/sciviz/hpa.yaml -f k8s/deployments/sciviz/secret.yaml -f k8s/deployments/sciviz/${VISIBILITY}/sci-viz/ -f k8s/deployments/sciviz/${VISIBILITY}/pharus/ )
+( kubectl -n sci-viz-public apply -f k8s/deployments/sciviz/hpa.yaml -f k8s/deployments/sciviz/secret.yaml -f k8s/deployments/sciviz/public/sci-viz/ -f k8s/deployments/sciviz/public/pharus/ )
 ```
 
