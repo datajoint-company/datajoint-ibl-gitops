@@ -6,7 +6,7 @@ metadata:
   labels:
     app: pharus
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: pharus
@@ -17,7 +17,14 @@ spec:
     spec:
       containers:
       - name: pharus
-        image: jverswijver/pharus:0.4.2-prerelease-2
+        image: jverswijver/pharus:0.4.2-prerelease-5
+        resources:
+          requests:
+            cpu: 900m
+            memory: 1Gi
+          limits:
+            cpu: 900m
+            memory: 1Gi
         env:
         - name: PHARUS_PORT
           value: "5000"

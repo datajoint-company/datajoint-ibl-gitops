@@ -1,14 +1,14 @@
 # kubectl -n sci-viz-public create configmap sci-viz-config --from-file=sci-viz-config.yaml
-# kubectl -n sci-viz-public create configmap sci-viz-config --from-file=sci-viz-config.yaml -o yaml --dry-run=client | kubectl -n sci-viz-public apply -f 
+# kubectl -n sci-viz-public create configmap sci-viz-config --from-file=sci-viz-config.yaml -o yaml --dry-run=client | kubectl -n sci-viz-public apply -f -
 version: "v0.0.0"
 LabBook: null
 SciViz: # top level tab
+  website_title: 'International Brain Laboratory'
+  favicon_name: 'ibl_icon.png'
   auth: False
   header:
-    image_route: ./IBLlogo.png
+    image_route: ./media/ibl_logo.png
     text: Data Portal
-  # login:
-  #   image_route: ./IBLlogo.png
   component_interface:
     static_variables:
       s3_host: $CUSTOM_S3_HOST|s3.amazonaws.com
@@ -17,97 +17,89 @@ SciViz: # top level tab
       s3_secret_key: $CUSTOM_S3_SECRET_KEY|secret_key
       s3_bucket: $CUSTOM_S3_BUCKET|bucket_name
     override: |
-      from pharus.component_interface import (type_map, PlotPlotlyStoredjsonComponent,
-                                              FileImageAttachComponent, NumpyEncoder)
-      import minio
       import io
+
+      import minio
       from flask import send_file
+      from pharus.component_interface import FileImageAttachComponent, NumpyEncoder, PlotPlotlyStoredjsonComponent, type_map
+
+
       class DepthPeth(PlotPlotlyStoredjsonComponent):
           def dj_query_route(self):
               fetch_metadata = self.fetch_metadata
-              record = (fetch_metadata['query'] & self.restriction).fetch(limit=1,
-                  *fetch_metadata['fetch_args'])
-              s3_client = minio.Minio(endpoint=self.static_variables['s3_host'],
-                                          region=self.static_variables['s3_region'],
-                                          access_key=self.static_variables['s3_access_key'],
-                                          secret_key=self.static_variables['s3_secret_key'],
-                                          secure=True)
+              record = (fetch_metadata["query"] & self.restriction).fetch(limit=1, *fetch_metadata["fetch_args"])
+              s3_client = minio.Minio(endpoint=self.static_variables["s3_host"], region=self.static_variables["s3_region"], access_key=self.static_variables["s3_access_key"], secret_key=self.static_variables["s3_secret_key"], secure=True)
               peth_template = record[0][11]
               color_scale = record[0][10]
               z_range = record[0][9]
               plot_xlim = record[0][8]
               plot_ylim = record[0][7]
               link = record[0][6]
-              compiled_link = s3_client.presigned_get_object(self.static_variables['s3_bucket'], link)
+              compiled_link = s3_client.presigned_get_object(self.static_variables["s3_bucket"], link)
               event = record[0][3]
-              
-              peth_template['data'][0]['x'] = [plot_xlim[0]-0.2, plot_xlim[0]-0.1]
-              peth_template['data'][0]['y'] = [plot_ylim[0]-0.2]
-              peth_template['data'][0]['z'] = z_range
-              peth_template['data'][0]['colorscale'] = color_scale
-              peth_template['layout']['images'][0]['source'] = compiled_link
-              peth_template['layout']['images'][0]['sizex'] = plot_xlim[1] - plot_xlim[0]
-              peth_template['layout']['images'][0]['sizey'] = plot_ylim[1] - plot_ylim[0]
-              peth_template['layout']['images'][0]['x'] = plot_xlim[0]
-              peth_template['layout']['images'][0]['y'] = plot_ylim[1]
-              peth_template['layout']['xaxis']['range'] = plot_xlim
-              peth_template['layout']['yaxis']['range'] = plot_ylim
-              peth_template['layout']['title']['text'] = f"Depth PETH, aligned to {event} time"
+
+              peth_template["data"][0]["x"] = [plot_xlim[0] - 0.2, plot_xlim[0] - 0.1]
+              peth_template["data"][0]["y"] = [plot_ylim[0] - 0.2]
+              peth_template["data"][0]["z"] = z_range
+              peth_template["data"][0]["colorscale"] = color_scale
+              peth_template["layout"]["images"][0]["source"] = compiled_link
+              peth_template["layout"]["images"][0]["sizex"] = plot_xlim[1] - plot_xlim[0]
+              peth_template["layout"]["images"][0]["sizey"] = plot_ylim[1] - plot_ylim[0]
+              peth_template["layout"]["images"][0]["x"] = plot_xlim[0]
+              peth_template["layout"]["images"][0]["y"] = plot_ylim[1]
+              peth_template["layout"]["xaxis"]["range"] = plot_xlim
+              peth_template["layout"]["yaxis"]["range"] = plot_ylim
+              peth_template["layout"]["title"]["text"] = f"Depth PETH, aligned to {event} time"
               return NumpyEncoder.dumps(peth_template)
+
+
       class SpikeAmpTime(PlotPlotlyStoredjsonComponent):
           def dj_query_route(self):
               fetch_metadata = self.fetch_metadata
-              record = (fetch_metadata['query'] & self.restriction).fetch(limit=1,
-                  *fetch_metadata['fetch_args'])
-              s3_client = minio.Minio(endpoint=self.static_variables['s3_host'],
-                                          region=self.static_variables['s3_region'],
-                                          access_key=self.static_variables['s3_access_key'],
-                                          secret_key=self.static_variables['s3_secret_key'],
-                                          secure=True)
+              record = (fetch_metadata["query"] & self.restriction).fetch(limit=1, *fetch_metadata["fetch_args"])
+              s3_client = minio.Minio(endpoint=self.static_variables["s3_host"], region=self.static_variables["s3_region"], access_key=self.static_variables["s3_access_key"], secret_key=self.static_variables["s3_secret_key"], secure=True)
               sat_template = record[0][8]
               plot_xlim = record[0][7]
               plot_ylim = record[0][6]
               link = record[0][5]
-              compiled_link = s3_client.presigned_get_object(self.static_variables['s3_bucket'], link)
-              sat_template['data'][0]['x'] = plot_xlim
-              sat_template['data'][0]['y'] = plot_ylim
-              sat_template['layout']['images'][0]['source'] = compiled_link
-              sat_template['layout']['images'][0]['sizex'] = plot_xlim[1] - plot_xlim[0]
-              sat_template['layout']['images'][0]['sizey'] = plot_ylim[1] - plot_ylim[0]
-              sat_template['layout']['images'][0]['x'] = plot_xlim[0]
-              sat_template['layout']['images'][0]['y'] = plot_ylim[1]
-              sat_template['layout']['xaxis']['range'] = plot_xlim
-              sat_template['layout']['yaxis']['range'] = plot_ylim
+              compiled_link = s3_client.presigned_get_object(self.static_variables["s3_bucket"], link)
+              sat_template["data"][0]["x"] = plot_xlim
+              sat_template["data"][0]["y"] = plot_ylim
+              sat_template["layout"]["images"][0]["source"] = compiled_link
+              sat_template["layout"]["images"][0]["sizex"] = plot_xlim[1] - plot_xlim[0]
+              sat_template["layout"]["images"][0]["sizey"] = plot_ylim[1] - plot_ylim[0]
+              sat_template["layout"]["images"][0]["x"] = plot_xlim[0]
+              sat_template["layout"]["images"][0]["y"] = plot_ylim[1]
+              sat_template["layout"]["xaxis"]["range"] = plot_xlim
+              sat_template["layout"]["yaxis"]["range"] = plot_ylim
               return NumpyEncoder.dumps(sat_template)
+
+
       class Autocorrelogram(PlotPlotlyStoredjsonComponent):
           def dj_query_route(self):
               fetch_metadata = self.fetch_metadata
-              record = (fetch_metadata['query'] & self.restriction).fetch(limit=1,
-                  *fetch_metadata['fetch_args'])
+              record = (fetch_metadata["query"] & self.restriction).fetch(limit=1, *fetch_metadata["fetch_args"])
               acg_template = record[0][5]
               acg = record[0][6]
               t_start = record[0][7]
               t_end = record[0][8]
               plot_ylim = record[0][9]
-              increment = (t_end - t_start) / (len(acg.split(',')) - 1)
+              increment = (t_end - t_start) / (len(acg.split(",")) - 1)
               xAcgArray = []
-              for x, _ in enumerate(acg.split(',')):
+              for x, _ in enumerate(acg.split(",")):
                   xAcgArray.append((t_start + (increment * float(x))) * 1000.0)
-              acg_template['data'][0]['x'] = xAcgArray
-              acg_template['data'][0]['y'] = [float(x) for x in acg.split(',')]
-              acg_template['layout']['yaxis']['range'] = plot_ylim
+              acg_template["data"][0]["x"] = xAcgArray
+              acg_template["data"][0]["y"] = [float(x) for x in acg.split(",")]
+              acg_template["layout"]["yaxis"]["range"] = plot_ylim
               return NumpyEncoder.dumps(acg_template)
+
+
       class TrialDepthRaster(PlotPlotlyStoredjsonComponent):
           def dj_query_route(self):
               fetch_metadata = self.fetch_metadata
-              record = (fetch_metadata['query'] & self.restriction).fetch(limit=1,
-                  *fetch_metadata['fetch_args'])
-              s3_client = minio.Minio(endpoint=self.static_variables['s3_host'],
-                                          region=self.static_variables['s3_region'],
-                                          access_key=self.static_variables['s3_access_key'],
-                                          secret_key=self.static_variables['s3_secret_key'],
-                                          secure=True)
-              
+              record = (fetch_metadata["query"] & self.restriction).fetch(limit=1, *fetch_metadata["fetch_args"])
+              s3_client = minio.Minio(endpoint=self.static_variables["s3_host"], region=self.static_variables["s3_region"], access_key=self.static_variables["s3_access_key"], secret_key=self.static_variables["s3_secret_key"], secure=True)
+
               tdr_template = record[0][15]
               trial_contrast = record[0][13]
               trial_feedback = record[0][12]
@@ -118,50 +110,44 @@ SciViz: # top level tab
               plot_xlim = record[0][7]
               plot_ylim = record[0][6]
               link = record[0][5]
-              compiled_link = s3_client.presigned_get_object(self.static_variables['s3_bucket'], link)
-              tdr_template['data'][0]['x'] = plot_xlim
-              tdr_template['data'][0]['y'] = plot_ylim
-              tdr_template['data'][1]['x'] = [trial_stim_on, trial_stim_on]
-              tdr_template['data'][1]['y'] = plot_ylim
-              tdr_template['data'][2]['x'] = [trial_movement, trial_movement]
-              tdr_template['data'][2]['y'] = plot_ylim
-              tdr_template['data'][3]['x'] = [trial_feedback, trial_feedback]
-              tdr_template['data'][3]['y'] = plot_ylim
-              tdr_template['data'][4]['x'] = [trial_stim_off, trial_stim_off]
-              tdr_template['data'][4]['y'] = plot_ylim
-              tdr_template['layout']['xaxis']['range'] = plot_xlim
-              tdr_template['layout']['yaxis']['range'] = plot_ylim
-              tdr_template['layout']['title']['text'] = plot_title
-              tdr_template['layout']['images'][0]['source'] = compiled_link
-              tdr_template['layout']['images'][0]['sizex'] = plot_xlim[1] - plot_xlim[0]
-              tdr_template['layout']['images'][0]['sizey'] = plot_ylim[1] - plot_ylim[0]
-              tdr_template['layout']['images'][0]['x'] = plot_xlim[0]
-              tdr_template['layout']['images'][0]['y'] = plot_ylim[1]
+              compiled_link = s3_client.presigned_get_object(self.static_variables["s3_bucket"], link)
+              tdr_template["data"][0]["x"] = plot_xlim
+              tdr_template["data"][0]["y"] = plot_ylim
+              tdr_template["data"][1]["x"] = [trial_stim_on, trial_stim_on]
+              tdr_template["data"][1]["y"] = plot_ylim
+              tdr_template["data"][2]["x"] = [trial_movement, trial_movement]
+              tdr_template["data"][2]["y"] = plot_ylim
+              tdr_template["data"][3]["x"] = [trial_feedback, trial_feedback]
+              tdr_template["data"][3]["y"] = plot_ylim
+              tdr_template["data"][4]["x"] = [trial_stim_off, trial_stim_off]
+              tdr_template["data"][4]["y"] = plot_ylim
+              tdr_template["layout"]["xaxis"]["range"] = plot_xlim
+              tdr_template["layout"]["yaxis"]["range"] = plot_ylim
+              tdr_template["layout"]["title"]["text"] = plot_title
+              tdr_template["layout"]["images"][0]["source"] = compiled_link
+              tdr_template["layout"]["images"][0]["sizex"] = plot_xlim[1] - plot_xlim[0]
+              tdr_template["layout"]["images"][0]["sizey"] = plot_ylim[1] - plot_ylim[0]
+              tdr_template["layout"]["images"][0]["x"] = plot_xlim[0]
+              tdr_template["layout"]["images"][0]["y"] = plot_ylim[1]
               return NumpyEncoder.dumps(tdr_template)
+
+
       class FileImageS3GlobalPointerComponent(FileImageAttachComponent):
           def dj_query_route(self):
               try:
                   fetch_metadata = self.fetch_metadata
-                  s3_relpath = (fetch_metadata['query'] & self.restriction).fetch1(
-                      *fetch_metadata['fetch_args'])
-                  s3_client = minio.Minio(endpoint=self.static_variables['s3_host'],
-                                          region=self.static_variables['s3_region'],
-                                          access_key=self.static_variables['s3_access_key'],
-                                          secret_key=self.static_variables['s3_secret_key'],
-                                          secure=True)
-                  result = s3_client.get_object(bucket_name=self.static_variables['s3_bucket'],
-                                                object_name=s3_relpath)
+                  s3_relpath = (fetch_metadata["query"] & self.restriction).fetch1(*fetch_metadata["fetch_args"])
+                  s3_client = minio.Minio(endpoint=self.static_variables["s3_host"], region=self.static_variables["s3_region"], access_key=self.static_variables["s3_access_key"], secret_key=self.static_variables["s3_secret_key"], secure=True)
+                  result = s3_client.get_object(bucket_name=self.static_variables["s3_bucket"], object_name=s3_relpath)
                   # extension in 'download_name' is used to determine the type of image
                   return send_file(io.BytesIO(result.data), download_name=s3_relpath)
               except Exception as e:
                   print(e, flush=True)
-                  return ''
-      type_map = dict({'file:image:s3:global_pointer': FileImageS3GlobalPointerComponent,
-                       'plot:Autocorrelogram': Autocorrelogram,
-                       'plot:SpikeAmpTime': SpikeAmpTime,
-                       'plot:DepthPeth': DepthPeth,
-                       'plot:TrialDepthRaster': TrialDepthRaster},
-                      **type_map)
+                  return ""
+
+
+      type_map = dict({"file:image:s3:global_pointer": FileImageS3GlobalPointerComponent, "plot:Autocorrelogram": Autocorrelogram, "plot:SpikeAmpTime": SpikeAmpTime, "plot:DepthPeth": DepthPeth, "plot:TrialDepthRaster": TrialDepthRaster}, **type_map)
+
   pages: # individual pages
     # The first page in the list of pages is the splash page after login
     # By convention this should be a home page with a markdown component
@@ -171,87 +157,145 @@ SciViz: # top level tab
         grid5:
           type: fixed
           columns: 1
-          row_height: 570
+          row_height: 510
           components:
-            comp:
+            comp1:
               x: 0
               y: 0
-              height: 1
+              height: 2
               width: 1
               type: markdown
-              # this example of image_route has the image in the /src dir
-              image_route: ../../home_ibl_brainbow.jpg
+              # this example of image_route has the image in the ./src/media dir
+              image_route: ../../media/home_ibl_brainbow.jpg
               text: |
-                # International Brain Laboratory Data Portal
+
+                <font size="6">
+
+                **International Brain Laboratory Data Portal**
+
+                </font><font size="4.5">
 
                 The [International Brain Laboratory](https://www.internationalbrainlab.com/) is a team of systems and computational neuroscientists, working collaboratively to understand the computations that support decision-making in the brain. Through this portal you can browse data gathered while mice made decisions that combine incoming visual evidence with internal beliefs about the dynamic structure of the environment.
 
                 For a comprehensive explanation of the data, and how to download it, please read our [Introduction to Publicly available IBL data](https://int-brain-lab.github.io/iblenv/public_docs/public_introduction.html).
 
+                <br/><br/>
+
                 ## **<span style="text-decoration: underline">View the data</span>**
 
-                **<span style="color:red">Please use Chrome as other browsers are not supported.</span>**       
+                **<span style="color:red">Please use Chrome as other browsers are not currently supported.</span>**
 
                 Two types of data are viewable through the portal:
-                1. **Electrophysiology data** recorded in the mouse brain during behavior. Neurons are recorded at various locations within the brain using Neuropixels probes, once mice are <span style=text-decoration: underline">experts</span> in the behavioural paradigm described below. Users can view the properties of the recorded neurons (e.g. waveforms), as well as their responses to different stimuli and events ongoing during behavior. The behavior data recorded during the session is also displayed (e.g. psychometric curve).
-                The data available here come from our recent publication ["Reproducibility of in-vivo electrophysiological measurements in mice", The International Brain Laboratory et al., bioRxiv. https://doi.org/10.1101/2022.05.09.491042](https://doi.org/10.1101/2022.05.09.491042).
-                You will also find electrophysiology data associated with 4 additional recordings, each acquired at a different institution, which serve as a teaser in preparation for the full data release expected in late 2022.
 
-                2. **Behavioral data throughout learning** from a standardized training pipeline, implemented across 9 labs in 7 institutions. Mice learn to make decisions that combine incoming visual evidence with internal beliefs about the dynamic structure of the environment. Through this portal, users can view behavioral data from mice throughout their training, and see the transition from novice to expert behavior unfold.
-                The content of this portal reflects the behavioral data associated with 198 mice up until 2020-03-23, as used in [The International Brain Laboratory et al. 2020](https://elifesciences.org/articles/63711).
-            comp1:
-              x: 0
-              y: 1
-              height: 0.3
-              width: 1
-              type: markdown
-              text: |
+                1. **Electrophysiology data** recorded in the mouse brain during behavior. Neurons are recorded at various locations within the brain using Neuropixels probes, once mice are _experts_ in the behavioural paradigm described below. Users can view the properties of the recorded neurons (e.g. waveforms), as well as their responses to different stimuli and events ongoing during behavior. The behavior data recorded during the session is also displayed (e.g. psychometric curve). The data available here come from our recent publication ["Reproducibility of in-vivo electrophysiological measurements in mice", The International Brain Laboratory et al., bioRxiv. https://doi.org/10.1101/2022.05.09.491042](https://doi.org/10.1101/2022.05.09.491042). You will also find electrophysiology data associated with 4 additional recordings, each acquired at a different institution, which serve as a teaser in preparation for the full data release expected in late 2022.
+                2. **Behavioral data throughout learning** from a standardized training pipeline, implemented across 9 labs in 7 institutions. Mice learn to make decisions that combine incoming visual evidence with internal beliefs about the dynamic structure of the environment. Through this portal, users can view behavioral data from mice throughout their training, and see the transition from novice to expert behavior unfold. The content of this portal reflects the behavioral data associated with 198 mice up until 2020-03-23, as used in [The International Brain Laboratory et al. 2020](https://elifesciences.org/articles/63711).
+
+                <br/><br/>
+
                 ## **<span style="text-decoration: underline">Access the data</span>**
+
                 Want to do more than just browse IBL data? Please check out our [Introduction to Publicly available IBL data](https://int-brain-lab.github.io/iblenv/public_docs/public_introduction.html) to access and download the data.
+
+                </font>
 
             comp2:
               x: 0
-              y: 1.3
-              height: 3
-              width: 1
+              y: 2
+              height: 2
+              width: 0.5
               type: markdown
               text: |
+
+                <font size="4.5">
+
                 ## **<span style="text-decoration: underline">Behavioral Paradigm</span>**
+
                 The IBL behavioral data is generated during a visual decision-making task for mice. Mice are trained to judge the spatial location of a visual stimulus (vertical grating) and report their decision by turning a wheel to move the stimulus into the center of the screen. The contrast of the visual stimulus can be varied, so that decisions range from easy to ambiguous. This allows quantification of the animals' threshold, bias, and lapse rates (below). Behavior during decision-making is characterized both using traditional metrics, such as choice and reaction time, along with video recordings from high-speed cameras.
-                ![mice](https://data.internationalbrainlab.org/assets/images/fig1.png)
-                Left-Right lick based behavioral paradigm
-                ![Left-Right bias conditions](https://data.internationalbrainlab.org/assets/images/fig2.png)
-                Left-Right bias conditions
-                ![graphs](https://data.internationalbrainlab.org/assets/images/fig2b.png)
-                Left: Average psychometric curve for each laboratory. Circles show the mean and error bars ± 1 the S.D. Middle: Psychometric curves shift between biased blocks averaged over all animals. For each animal and signed contrast, we computed their ‘bias shift’ (Δ) by reading out the difference in choice fraction between the 80:20 and 20:80 blocks (dashed lines). Right: Average shift in rightward choices as a function of signed contrast for each laboratory (colors as in c; error bars show mean +- 68% CI)
-                ![more graphs](https://data.internationalbrainlab.org/assets/images/PMFSchematic.png)
-                Animals' bias, threshold, and lapse rate
+
+                <center>
+
+                **Mice Behavior Paradigm**
+
+                <img src="/media/beh_pdm.png" alt="Mice Behavior Paradigm" width="60%">
+
+                <br/><br/>
+
+                **Left-Right Licks Based on Behavioral Paradigm**
+
+                <img src="/media/lr_licks.png" alt="Lick-Based Behavior Paradigm" width="65%">
+
+                </center></font>
+
             comp3:
-              x: 0
-              y: 4.3
-              height: 1.7
-              width: 1
+              x: 0.5
+              y: 2
+              height: 2
+              width: 0.5
               type: markdown
               text: |
-                ## **<span style="text-decoration: underline">Training Criteria</span>**
-                We present here a summary of training stages and a list of criteria. For exact definitions and calculus details, please see The International Brain Laboratory et al. 2020. The related training status indicated on the website are marked in bold and quoted.
-                When the animal starts behavioral training, it first undergoes a period of habituation, then it is trained on the basic task until reaching full proficiency (**trained**). If the mouse does not reach proficiency in the basic task within 40 days of training, it is marked as untrainable. Once proficiency in the basic task is reached, the animal is trained in the biased task until proficiency is achieved (**ready for ephys rig**).
-                Once the animal is placed on the ephys rig, it undergoes a habituation to that rig until it is deemed ready for electrophysiological recordings to be conducted (‘ready for neuropixels recording’). Once a recording has been completed, the behavior quality is validated for downstream analysis (‘good enough for brainwide map’). 
-                The associated methods and protocols to habituate a mouse to the ephys rig and perform the Neuropixels recording are detailed in [The International Brain Laboratory et al, 2022](https://www.biorxiv.org/content/10.1101/2022.05.09.491042); please see the figure below for a summary of our training pipeline.
-                ![flowchart](https://data.internationalbrainlab.org/assets/images/training_pipeline.svg)
+
+                <font size="4.5"><center>
+
+                **Left-Right Bias Conditions**
+
+                <br/>
+
+                <img src="/media/lr_bias_cond.png" alt="Left-Right Bias Conditions" width="85%">
+
+                </center><br/></font><font size="3">
+
+                _Left_: Average psychometric curve for each laboratory. Circles show the mean and error bars ± 1 the S.D. _Middle_: Psychometric curves shift between biased blocks averaged over all animals. For each animal and signed contrast, we computed their ‘bias shift’ (Δ) by reading out the difference in choice fraction between the 80:20 and 20:80 blocks (dashed lines). _Right_: Average shift in rightward choices as a function of signed contrast for each laboratory (colors as in c; error bars show mean +- 68% CI)
+
+                <br/></font><br/><font size="4.5"><center>
+
+                **Animals' Bias, Threshold, and Lapse Rate**
+
+                <img src="/media/pmf_schematic.png" alt="Bias, Threshold, and Lapse" width="85%">
+
+                <br/></center></font>
+
             comp4:
               x: 0
-              y: 6
-              height: 0.4
+              y: 4
+              height: 1.75
               width: 1
               type: markdown
               text: |
+
+                <font size="4.5">
+
+                ## **<span style="text-decoration: underline">Training Criteria</span>**
+
+                We present here a summary of training stages and a list of criteria. For exact definitions and calculus details, please see The International Brain Laboratory et al. 2020. The related training status indicated on the website are marked in bold and quoted.
+                When the animal starts behavioral training, it first undergoes a period of habituation, then it is trained on the basic task until reaching full proficiency (**trained**). If the mouse does not reach proficiency in the basic task within 40 days of training, it is marked as untrainable. Once proficiency in the basic task is reached, the animal is trained in the biased task until proficiency is achieved (**ready for ephys rig**).
+                Once the animal is placed on the ephys rig, it undergoes a habituation to that rig until it is deemed ready for electrophysiological recordings to be conducted (**ready for neuropixels recording**). Once a recording has been completed, the behavior quality is validated for downstream analysis (**good enough for brainwide map**).
+                The associated methods and protocols to habituate a mouse to the ephys rig and perform the Neuropixels recording are detailed in [The International Brain Laboratory et al, 2022](https://www.biorxiv.org/content/10.1101/2022.05.09.491042); please see the figure below for a summary of our training pipeline.
+
+                </br><center>
+
+                <img src="/media/training_pipeline.svg" width="75%">
+
+                </center></font>
+
+            comp5:
+              x: 0
+              y: 5.75
+              height: 0.6
+              width: 1
+              type: markdown
+              text: |
+
+                <font size="4.5">
+
                 ## **<span style="text-decoration: underline">Questions</span>**
+
                 Issues with accessing the data? Email info@internationalbrainlab.org.
 
                 General questions about the paper [The International Brain Laboratory et al. 2020](https://elifesciences.org/articles/63711)? Email info+behavior@internationalbrainlab.org.
 
                 General questions about the paper ["Reproducibility of in-vivo electrophysiological measurements in mice," The International Brain Laboratory et al., 2022](https://www.biorxiv.org/content/10.1101/2022.05.09.491042)? Email info@internationalbrainlab.org.
+
+                </font>
 
     Mice:
       route: /mice
@@ -261,9 +305,27 @@ SciViz: # top level tab
           columns: 1
           row_height: 680
           components:
-            mousetable:
+            comp0:
               x: 0
               y: 0
+              height: 0.4
+              width: 1
+              type: markdown
+              text: |
+
+                <font size="4.5">
+
+                ### Navigating the Mice table below
+
+                - Click on the arrows next to each column to sort in ascending or descending order.
+                - Each column can be filtered by clicking on the _funnel_ icon next to the column name. You can search for a particular entry or pick from the drop-down list.
+                - Click on an entry to view graphical summaries of behavior and/or electrophysiology data for the animal across sessions.
+
+                </font>
+
+            mousetable:
+              x: 0
+              y: 0.4
               height: 1
               width: 1
               link: /mouseplots
@@ -273,9 +335,21 @@ SciViz: # top level tab
                 def restriction(**kwargs):
                     return dict(**kwargs)
               dj_query: >
-                def dj_query(ibl_subject):
-                    Mouse = ibl_subject.Subject
-                    return dict(query=(Mouse), fetch_args=[])
+                def dj_query(ibl_subject, ibl_behavior, ibl_ephys, ibl_plotting_histology):
+                    subj = (
+                        (ibl_subject.Subject.proj("subject_nickname", "subject_birth_date", "sex", "subject_line"))
+                        .join(ibl_subject.SubjectLab.proj(subject_lab="lab_name"), left=True)
+                        .aggr(ibl_subject.SubjectProject, ..., subject_projects='GROUP_CONCAT(DISTINCT subject_project ORDER BY subject_project SEPARATOR ",")', keep_all_rows=True)
+                        .proj(..., "-subject_projects", projects='IFNULL(subject_projects, "unassigned")')
+                        .aggr(ibl_behavior.TrialSet, ..., behav_session_count="count(session_start_time)", keep_all_rows=True)
+                        .proj(..., "-behav_session_count", has_behavior="behav_session_count > 0")
+                        .aggr(ibl_ephys.ProbeInsertion, ..., insertion_count="count(probe_idx)", keep_all_rows=True)
+                        .proj(..., "-insertion_count", has_ephys="insertion_count > 0")
+                    )
+
+                    subj = subj.proj("subject_uuid", Lab="subject_lab", SubjectNickname="subject_nickname", Sex="sex", DOB="subject_birth_date", Line="subject_line", Project="projects", HasBehavior="has_behavior", HasEphys="has_ephys")
+                    return dict(query=subj, fetch_args=[])
+
     Sessions:
       route: /sessions
       grids:
@@ -284,10 +358,28 @@ SciViz: # top level tab
           columns: 1
           row_height: 680
           components:
+            comp0:
+              x: 0
+              y: 0
+              height: 0.4
+              width: 1
+              type: markdown
+              text: |
+
+                <font size="4.5">
+
+                ### Navigating the Sessions table below
+
+                - Click on the arrows next to each column to sort in ascending or descending order.
+                - Each column can be filtered by clicking on the _funnel_ icon next to the column name. You can search for a particular entry or pick from the drop-down list.
+                - Click on an entry to view graphical summaries of behavior and/or electrophysiology data for the session.
+
+                </font>
+
             Sessionstable:
               route: /sessions_query
               x: 0
-              y: 0
+              y: 0.4
               height: 1
               width: 1
               type: antd-table
@@ -296,16 +388,13 @@ SciViz: # top level tab
                 def restriction(**kwargs):
                     return dict(**kwargs)
               dj_query: >
-                def dj_query(ibl_subject, ibl_acquisition):
-                    subj = ibl_subject.Subject().aggr(
-                        ibl_subject.Death().proj('death_date') * dj.U('death_date'),
-                        death_date='IFNULL(death_date, NULL)',
-                        keep_all_rows=True)
-                    q = (ibl_acquisition.Session * subj).proj(
-                        ...,
-                        _sciviz_font='IF(death_date IS NOT NULL, "rgb(255, 0, 0)", NULL)', # deceased mice
-                        )
-                    return dict(query=q, fetch_args=[])
+                def dj_query(ibl_subject, ibl_behavior, ibl_acquisition, ibl_ephys, ibl_plotting_behavior, ibl_analyses_behavior):
+                    subj = ibl_subject.Subject.proj("subject_nickname")
+                    sess = (ibl_acquisition.Session.proj("session_uuid", "session_lab", "task_protocol") * subj).join(ibl_acquisition.SessionProject.proj(project="session_project"), left=True).aggr(ibl_behavior.SessionTag.Tag, ..., all_tags='GROUP_CONCAT(DISTINCT tag SEPARATOR ", ")', keep_all_rows=True).proj(..., "-all_tags", tags='IFNULL(all_tags, "unassigned")')
+                    sess = sess.proj("subject_uuid", "session_start_time", Lab="session_lab", SubjectNickname="subject_nickname", SessionUUID="session_uuid", Project="session_project", TaskProtocol="task_protocol", Tags="tags")
+
+                    return dict(query=sess, fetch_args=[])
+
     Mouseplots:
       route: /mouseplots
       hidden: True
@@ -696,142 +785,4 @@ SciViz: # top level tab
                 "0.125": "trial_contrast=0.125"
                 "0.25": "trial_contrast=0.25"
                 "1": "trial_contrast=1"
-    # Daily Summary:
-    #   route: /summary
-    #   grids:
-    #     mygrid:
-    #       type: dynamic
-    #       route: /dgridsummary
-    #       columns: 2
-    #       row_height: 1300
-    #       restriction: >
-    #         def restriction(**kwargs):
-    #             return dict(**kwargs)
-    #       dj_query: >
-    #         def dj_query(ibl_plotting_behavior):
-    #             q = ibl_plotting_behavior.CumulativeSummary
-
-    #             return dict(query=(q), fetch_args={'order_by': 'latest_date DESC'})
-    #       component_templates:
-    #         # metadata:
-    #         #   route: /summarymetadata
-    #         #   type: metadata
-    #         #   restriction: >
-    #         #     def restriction(**kwargs):
-    #         #         return dict(**kwargs)
-    #         #   dj_query: >
-    #         #     def dj_query(ibl_plotting_behavior):
-    #         #         plot = ibl_plotting_behavior.DailyLabSummary.SubjectSummary
-    #         #         return dict(query=plot, fetch_args=[])
-    #         ContrastHeatmapSummary:
-    #           route: /ContrastHeatmapSummary
-    #           type: plot:plotly:stored_json
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.ContrastHeatmap
-    #                 return dict(query=plot, fetch_args=['contrast_heatmap'])
-    #         PerformanceReactionTimeSummary:
-    #           route: /PerformanceReactionTimeSummary
-    #           type: plot:plotly:stored_json
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.PerformanceReactionTime
-    #                 return dict(query=plot, fetch_args=['performance_reaction_time'])
-    #         TrialCountsSessionDuration:
-    #           route: /TrialCountsSessionDuration
-    #           type: plot:plotly:stored_json
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.TrialCountsSessionDuration
-    #                 return dict(query=plot, fetch_args=['trial_counts_session_duration'])
-    #-----------------Only for internal navigator-----------------
-    #  WaterWeightSummary:
-    #   route: /WaterWeightSummary
-    #   type: plot:plotly:stored_json
-    #   restriction: >
-    #     def restriction(**kwargs):
-    #         return dict(**kwargs)
-    #   dj_query: >
-    #     def dj_query(ibl_plotting_behavior):
-    #         plot = ibl_plotting_behavior.CumulativeSummary.WaterWeight
-    #         return dict(query=plot, fetch_args=['water_weight'])
-    # Daily Summary:
-    #   route: /summary
-    #   grids:
-    #     mygrid:
-    #       type: static
-    #       columns: 3
-    #       row_height: 500
-    #       components:
-    #         Click on table row to see plots for that subject:
-    #           route: /summarytable
-    #           type: table
-    #           x: 0
-    #           y: 0
-    #           height: 1
-    #           width: 3
-    #           channel: mytable
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior, ibl_subject):
-    #                 summary = ibl_plotting_behavior.CumulativeSummary
-    #                 subject = ibl_subject.Subject
-    #                 q = subject*summary & subject.aggr(summary, latest_date='MAX(latest_date)')
-    #                 return dict(query=q, fetch_args={'order_by': 'latest_date DESC'})
-    #         ContrastHeatmapSummary:
-    #           route: /ContrastHeatmapSummary
-    #           type: plot:plotly:stored_json
-    #           x: 0
-    #           y: 1
-    #           height: 1
-    #           width: 1
-    #           channels: [mytable]
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.ContrastHeatmap
-    #                 return dict(query=plot, fetch_args=['contrast_heatmap'])
-    #         PerformanceReactionTimeSummary:
-    #           route: /PerformanceReactionTimeSummary
-    #           type: plot:plotly:stored_json
-    #           x: 1
-    #           y: 1
-    #           height: 1
-    #           width: 1
-    #           channels: [mytable]
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.PerformanceReactionTime
-    #                 return dict(query=plot, fetch_args=['performance_reaction_time'])
-    #         TrialCountsSessionDuration:
-    #           route: /TrialCountsSessionDuration
-    #           type: plot:plotly:stored_json
-    #           x: 2
-    #           y: 1
-    #           height: 1
-    #           width: 1
-    #           channels: [mytable]
-    #           restriction: >
-    #             def restriction(**kwargs):
-    #                 return dict(**kwargs)
-    #           dj_query: >
-    #             def dj_query(ibl_plotting_behavior):
-    #                 plot = ibl_plotting_behavior.CumulativeSummary.TrialCountsSessionDuration
-    #                 return dict(query=plot, fetch_args=['trial_counts_session_duration'])
 

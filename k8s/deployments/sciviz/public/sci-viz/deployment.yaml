@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: sci-viz
-        image: jverswijver/sci-viz:0.2.0-prerelease-2
+        image: jverswijver/sci-viz:0.2.0-prerelease-7
         env:
           - name: CHOKIDAR_USEPOLLING
             value: "true"
@@ -34,22 +34,35 @@ spec:
             mountPath: "/main/specs"
             readOnly: true
           - name: logo
-            mountPath: "/main/src/IBLlogo.png"
+            mountPath: "/main/src/media/ibl_logo.png"
             readOnly: true
-            subPath: "IBLlogo.png"
+            subPath: "ibl_logo.png"
           - name: brainbow
-            mountPath: "/main/src/home_ibl_brainbow.jpg"
+            mountPath: "/main/src/media/home_ibl_brainbow.jpg"
             readOnly: true
             subPath: "home_ibl_brainbow.jpg"
+          - name: media-md
+            mountPath: "/main/public/media/"
+            readOnly: true
+          - name: icon
+            mountPath: "/main/public/ibl_icon.png"
+            readOnly: true
+            subPath: "ibl_icon.png"
       volumes:
       - name: spec
         configMap:
           name: sci-viz-config
       - name: logo
         configMap:
-          name: ibl-logo
+          name: logo
       - name: brainbow
         configMap:
           name: brainbow
+      - name: media-md
+        configMap:
+          name: media-md
+      - name: icon
+        configMap:
+          name: icon
 ...
 
