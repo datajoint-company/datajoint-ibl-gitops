@@ -1,0 +1,133 @@
+# sed "s|jupyter|vathes|g; s|v0.0.0|v0.0.0|g; s|- "www.jupyterhub.internationalbrainlab.org"
+        - "jupyter.internationalbrainlab.org"|$(URL_TLS=www.vathes.com,vathes.com python3 -c "print('\\\n        '.join([f'- \"{d}\"' for d in __import__('os').getenv('URL_TLS').split(',')]))")|g; s|- host: "www.jupyterhub.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80
+    - host: "jupyter.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80|$(URL_RULE=www.vathes.com,vathes.com python3 -c "print('\\\n    '.join([f'- host: \"{d}\"\\\n      http:\\\n        paths:\\\n          - backend:\\\n              serviceName: {{vathes-com}}-app\\\n              servicePort: 80' for d in __import__('os').getenv('URL_RULE').split(',')]))")|g; s|vathes-com|vathes-com|g" ./k8s_deploy.yaml | kubectl apply -f -
+# sed "s|jupyter|djneuro|g; s|v0.0.0|v0.0.0|g; s|- "www.jupyterhub.internationalbrainlab.org"
+        - "jupyter.internationalbrainlab.org"|$(URL_TLS=www.djneuro.io,djneuro.io,www.datajointneuro.io,datajointneuro.io python3 -c "print('\\\n        '.join([f'- \"{d}\"' for d in __import__('os').getenv('URL_TLS').split(',')]))")|g; s|- host: "www.jupyterhub.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80
+    - host: "jupyter.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80|$(URL_RULE=www.djneuro.io,djneuro.io,www.datajointneuro.io,datajointneuro.io python3 -c "print('\\\n    '.join([f'- host: \"{d}\"\\\n      http:\\\n        paths:\\\n          - backend:\\\n              serviceName: {{vathes-com}}-app\\\n              servicePort: 80' for d in __import__('os').getenv('URL_RULE').split(',')]))")|g; s|vathes-com|djneuro-io|g" ./k8s_deploy.yaml | kubectl apply -f -
+# sed "s|jupyter|datajointio|g; s|v0.0.0|v0.0.3|g; s|- "www.jupyterhub.internationalbrainlab.org"
+        - "jupyter.internationalbrainlab.org"|$(URL_TLS=www.datajoint.io,datajoint.io python3 -c "print('\\\n        '.join([f'- \"{d}\"' for d in __import__('os').getenv('URL_TLS').split(',')]))")|g; s|- host: "www.jupyterhub.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80
+    - host: "jupyter.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80|$(URL_RULE=www.datajoint.io,datajoint.io python3 -c "print('\\\n    '.join([f'- host: \"{d}\"\\\n      http:\\\n        paths:\\\n          - backend:\\\n              serviceName: {{vathes-com}}-app\\\n              servicePort: 80' for d in __import__('os').getenv('URL_RULE').split(',')]))")|g; s|vathes-com|datajoint-io|g" ./k8s_deploy.yaml | kubectl apply -f -
+# sed "s|jupyter|sciops-signup-forward|g; s|v0.0.0|v0.0.0|g; s|- "www.jupyterhub.internationalbrainlab.org"
+        - "jupyter.internationalbrainlab.org"|$(URL_TLS=ops.datajoint.com python3 -c "print('\\\n        '.join([f'- \"{d}\"' for d in __import__('os').getenv('URL_TLS').split(',')]))")|g; s|- host: "www.jupyterhub.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80
+    - host: "jupyter.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80|$(URL_RULE=ops.datajoint.com python3 -c "print('\\\n    '.join([f'- host: \"{d}\"\\\n      http:\\\n        paths:\\\n          - backend:\\\n              serviceName: {{vathes-com}}-app\\\n              servicePort: 80' for d in __import__('os').getenv('URL_RULE').split(',')]))")|g; s|vathes-com|sciops-signup-forward|g" ./k8s_deploy.yaml | kubectl apply -f -
+# sed "s|jupyter|jupyter|g; s|v0.0.0|v0.0.0|g; s|- "www.jupyterhub.internationalbrainlab.org"
+        - "jupyter.internationalbrainlab.org"|$(URL_TLS=www.jupyterhub.internationalbrainlab.org,jupyter.internationalbrainlab.org python3 -c "print('\\\n        '.join([f'- \"{d}\"' for d in __import__('os').getenv('URL_TLS').split(',')]))")|g; s|- host: "www.jupyterhub.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80
+    - host: "jupyter.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80|$(URL_RULE=www.vathes.com,vathes.com python3 -c "print('\\\n    '.join([f'- host: \"{d}\"\\\n      http:\\\n        paths:\\\n          - backend:\\\n              serviceName: {{vathes-com}}-app\\\n              servicePort: 80' for d in __import__('os').getenv('URL_RULE').split(',')]))")|g; s|vathes-com|vathes-com|g" ./k8s_deploy.yaml | kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: vathes-com-app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: vathes-com-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vathes-com-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vathes-com-app
+  template:
+    metadata:
+      labels:
+        app: vathes-com-app
+        # iam.amazonaws.com/role: k8s_admin
+    spec:
+      imagePullSecrets:
+        - name: external-registry-creds
+      containers:
+        - name: vathes-com
+          image: registry.vathes.com/datajoint/jupyter:v0.0.0
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              cpu: 100m
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: vathes-com-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: letsencrypt-staging
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - "www.jupyterhub.internationalbrainlab.org"
+        - "jupyter.internationalbrainlab.org"
+      secretName: vathes-com-tls
+  rules:
+    - host: "www.jupyterhub.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80
+    - host: "jupyter.internationalbrainlab.org"
+      http:
+        paths:
+          - backend:
+              serviceName: vathes-com-app
+              servicePort: 80
+
