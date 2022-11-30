@@ -207,7 +207,7 @@ hub:
               },
           }
 
-          spawner.profile_list = [default_profile] + [v for k, v in profile_map.items() if spawner.user.name in allowed_users[k]]
+          spawner.profile_list = [default_profile] # + [v for k, v in profile_map.items() if spawner.user.name in allowed_users[k]]
           return spawner._options_form_default()
 
       # Add login page to template directory
@@ -238,104 +238,104 @@ cull:
   every: 300
   maxAge: 43200
 # custom:
-#   login_page: |
-#     {% extends "templates/login.html" %}
-#     {% block login %}
+  # login_page: |
+    # {% extends "templates/login.html" %}
+    # {% block login %}
 
-#     <head>
-#     <title>DataJoint Compute</title>
-#     <link rel="icon" type="image/png"
-#       sizes="32x32" href="https://accounts.datajoint.io/static/favicons/favicon-32x32.png">
-#     <meta name="description" content="An interactive, web-based, DataJoint compute environment launcher.">
-#     <style>
-#     .vertical-center {
-#         margin: 0;
-#         position: absolute;
-#         top: 50%;
-#         -ms-transform: translateY(-50%);
-#         transform: translateY(-50%);
-#     }
-#     </style>
-#     </head>
+    # <head>
+    # <title>DataJoint Compute</title>
+    # <link rel="icon" type="image/png"
+      # sizes="32x32" href="https://accounts.datajoint.io/static/favicons/favicon-32x32.png">
+    # <meta name="description" content="An interactive, web-based, DataJoint compute environment launcher.">
+    # <style>
+    # .vertical-center {
+        # margin: 0;
+        # position: absolute;
+        # top: 50%;
+        # -ms-transform: translateY(-50%);
+        # transform: translateY(-50%);
+    # }
+    # </style>
+    # </head>
 
-#     <div class='container branding'>
-#     <div class="vertical-center">
-#     <img
-#     src='https://accounts.datajoint.io/static/images/dj2-medium.png'>
-#     <p align="center">
-#         <br>
-#         Welcome to DataJoint's Public Jupyter environment!<br>
-#         Here you may explore what DataJoint Python can do<br>
-#         via Jupyter Notebooks. All that is needed is a<br>
-#         <a href="https://accounts.datajoint.io/">DataJoint</a> login.<br>
-#         <br>
-#         When you are done, feel free to join the community<br>
-#         in our <a href="https://join.slack.com/t/datajoint/shared_invite/zt-3pioa7mu-R_G_z07arbgLelDuDxotdg">DataJoint Slack</a> so you can let us know<br>
-#         what you think!<br>
-#         <br>
-#         Happy DataJoint'ing!!<br>
-#         <br>
-#     </p>
-#     {{ super() }}
-#     </div>
-#     </div>
+    # <div class='container branding'>
+    # <div class="vertical-center">
+    # <img
+    # src='https://accounts.datajoint.io/static/images/dj2-medium.png'>
+    # <p align="center">
+        # <br>
+        # Welcome to DataJoint's Public Jupyter environment!<br>
+        # Here you may explore what DataJoint Python can do<br>
+        # via Jupyter Notebooks. All that is needed is a<br>
+        # <a href="https://accounts.datajoint.io/">DataJoint</a> login.<br>
+        # <br>
+        # When you are done, feel free to join the community<br>
+        # in our <a href="https://join.slack.com/t/datajoint/shared_invite/zt-3pioa7mu-R_G_z07arbgLelDuDxotdg">DataJoint Slack</a> so you can let us know<br>
+        # what you think!<br>
+        # <br>
+        # Happy DataJoint'ing!!<br>
+        # <br>
+    # </p>
+    # {{ super() }}
+    # </div>
+    # </div>
 
-#     {% endblock %}
+    # {% endblock %}
 
-#     {% block stylesheet %}
-#     {{ super() }}
-#     <style>
-#     .branding img {
-#         display: block;
-#         width: 350px;
-#         /* top right bottom left */
-#         margin: 0 auto 0 auto;
-#     }
-#     #login-main .auth-form-body {
-#         border-color: rgb(0, 124, 186);
-#         color: white;
-#     }
-#     #login-main {
-#         margin-top: 1%;
-#         height: 100%;
-#     }
-#     footer {
-#         border-top: 1px solid silver;
-#         padding: 10px;
-#         bottom: 0;
-#         position: fixed;
-#         width: 100%;
-#     }
-#     footer p{
-#         margin: 0 auto 0 auto;
-#         text-align: center;
-#     }
-#     #login-main form {
-#         vertical-align: top;
-#     }
-#     #login-main .auth-form-header {
-#         color: white;
-#         background: rgb(219, 170, 0);
-#         border: 1px solid;
-#         border-color: rgb(0, 124, 186);
-#     }
-#     #insecure-login-warning {
-#         color: black;
-#     }
-#     .btn-jupyter.active, .btn-jupyter:active, .open>.dropdown-toggle.btn-jupyter {
-#         box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px #a88400;
-#         border-color: #a88400;
-#         outline-color: #a88400;
-#     }
-#     #login-main .form-control:focus, #login-main input[type=submit]:focus {
-#         box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgb(219, 170, 0);
-#         border-color: rgb(219, 170, 0);
-#         outline-color: rgb(219, 170, 0);
-#     }
-#     .btn-jupyter {
-#         color: #fff;
-#         background-color: rgb(219, 170, 0);
-#         border-color: rgb(219, 170, 0);
-#     }
-#     </style>
-#     {% endblock %}
+    # {% block stylesheet %}
+    # {{ super() }}
+    # <style>
+    # .branding img {
+        # display: block;
+        # width: 350px;
+        # /* top right bottom left */
+        # margin: 0 auto 0 auto;
+    # }
+    # #login-main .auth-form-body {
+        # border-color: rgb(0, 124, 186);
+        # color: white;
+    # }
+    # #login-main {
+        # margin-top: 1%;
+        # height: 100%;
+    # }
+    # footer {
+        # border-top: 1px solid silver;
+        # padding: 10px;
+        # bottom: 0;
+        # position: fixed;
+        # width: 100%;
+    # }
+    # footer p{
+        # margin: 0 auto 0 auto;
+        # text-align: center;
+    # }
+    # #login-main form {
+        # vertical-align: top;
+    # }
+    # #login-main .auth-form-header {
+        # color: white;
+        # background: rgb(219, 170, 0);
+        # border: 1px solid;
+        # border-color: rgb(0, 124, 186);
+    # }
+    # #insecure-login-warning {
+        # color: black;
+    # }
+    # .btn-jupyter.active, .btn-jupyter:active, .open>.dropdown-toggle.btn-jupyter {
+        # box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px #a88400;
+        # border-color: #a88400;
+        # outline-color: #a88400;
+    # }
+    # #login-main .form-control:focus, #login-main input[type=submit]:focus {
+        # box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgb(219, 170, 0);
+        # border-color: rgb(219, 170, 0);
+        # outline-color: rgb(219, 170, 0);
+    # }
+    # .btn-jupyter {
+        # color: #fff;
+        # background-color: rgb(219, 170, 0);
+        # border-color: rgb(219, 170, 0);
+    # }
+    # </style>
+    # {% endblock %}
