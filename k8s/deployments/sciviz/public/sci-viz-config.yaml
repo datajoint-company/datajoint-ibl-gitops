@@ -390,7 +390,9 @@ SciViz: # top level tab
               dj_query: >
                 def dj_query(ibl_subject, ibl_behavior, ibl_acquisition, ibl_ephys, ibl_plotting_behavior, ibl_analyses_behavior):
                     subj = ibl_subject.Subject.proj("subject_nickname")
-                    sess = (ibl_acquisition.Session.proj("session_uuid", "session_lab", "task_protocol") * subj).join(ibl_acquisition.SessionProject.proj(project="session_project"), left=True).aggr(ibl_behavior.SessionTag.Tag, ..., all_tags='GROUP_CONCAT(DISTINCT tag SEPARATOR ", ")', keep_all_rows=True).proj(..., "-all_tags", tags='IFNULL(all_tags, "unassigned")')
+                    tags = ibl_behavior.SessionTag.Tag & "tag LIKE 'Behavi%' or tag LIKE 'Repeated%'"
+                    sess_proj = (ibl_acquisition.Session.proj("session_uuid", "session_lab", "task_protocol") * subj).join(ibl_acquisition.SessionProject.proj(project="session_project"), left=True)
+                    sess = sess_proj.aggr(tags, ..., all_tags='GROUP_CONCAT(DISTINCT tag SEPARATOR ", ")', keep_all_rows=True).proj(..., "-all_tags", tags='IFNULL(all_tags, "unassigned")')
                     sess = sess.proj("subject_uuid", "session_start_time", Lab="session_lab", SubjectNickname="subject_nickname", SessionUUID="session_uuid", Project="session_project", TaskProtocol="task_protocol", Tags="tags")
 
                     return dict(query=sess, fetch_args=[])
@@ -418,7 +420,7 @@ SciViz: # top level tab
                 def dj_query(ibl_subject):
                     Mouse = ibl_subject.Subject
                     return dict(query=(Mouse), fetch_args=[])
-            subject spinning brain:
+            subjectSpinningBrain:
               route: /session_gif_query
               x: 1
               y: 0
@@ -587,7 +589,7 @@ SciViz: # top level tab
                     return dict(**kwargs)
               dj_query: >
                 def dj_query(ibl_acquisition):
-                    Session = ibl_acquisition.Session
+                    Session = dj.U("SessionUUID", "StartTime", "EndTime", "Lab", "Location", "TaskProtocol", "Type") & ibl_acquisition.Session.proj(SessionUUID="session_uuid", StartTime="session_start_time", EndTime="session_end_time", Lab="session_lab", Location="session_location", TaskProtocol="task_protocol", Type="session_type")
                     return dict(query=(Session), fetch_args=[])
             mousemetadata:
               route: /sessionmousemeta
@@ -601,10 +603,8 @@ SciViz: # top level tab
                     return dict(**kwargs)
               dj_query: >
                 def dj_query(ibl_acquisition, ibl_subject):
-                    Session = ibl_acquisition.Session
-                    Mouse = ibl_subject.Subject
-                    q = Mouse * Session.proj()
-                    return dict(query=(q), fetch_args=[])
+                    Mouse = dj.U("SubjectUUID", "SubjectNickname", "Sex", "BirthDate", "EarMark", "Line", "Source", "ProtocolNum", "Description") & ibl_subject.Subject.proj(SubjectUUID="subject_uuid", SubjectNickname="subject_nickname", Sex="sex", BirthDate="subject_birth_date", EarMark="ear_mark", Line="subject_line", Source="subject_source", ProtocolNum="protocol_number", Description="subject_description")
+                    return dict(query=(Mouse), fetch_args=[])
             SessionPsychCurve:
               route: /SessionPsychCurve2
               x: 0
